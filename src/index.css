@@ -1,68 +1,43 @@
+/*-------- GOOGLE FONTS --------*/
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap");
+
+/*-------- VARIABLES --------*/
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /*-------- COLORS --------*/
+  --container-color: rgba(249, 250, 251, 1);
+  --body-color: rgba(204, 204, 204, 1);
+  --header-color: rgba(17, 24, 39, 1);
+  --footer-color: rgba(17, 24, 39, 1);
+  --button-color: rgba(80, 72, 229, 1);
+  --title-color: rgba(17, 24, 39, 1);
+  --text-color-dark: rgba(17, 24, 39, 1);
+  --text-color: rgba(107, 114, 128, 1);
+  --text-color-light: rgba(151, 151, 151, 1);
+  --text-color-white: rgba(255, 255, 255, 1);
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /*-------- FONTS and TYPOGRAPHY --------*/
+  --body-font: "Inter", sans-serif;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /*  1rem = 10px  */
+  --h4-font-size: 3.2rem;
+  --normal-font-size: 1.6rem;
+  --small-font-size: 1.4rem;
+  --tiny-font-size: 1rem;
+
+  /*-------- FONTS WEIGTH --------*/
+  --font-bold: 700;
+  --font-semi-bold: 600;
+  --font-medium: 500;
+  --font-normal: 400;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
+* {
+  padding: 0;
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  box-sizing: border-box;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+html {
+  /* To make 1rem equals to 10px / 16px = 0.625 = 62.5% */
+  font-size: 62.5%;
 }
