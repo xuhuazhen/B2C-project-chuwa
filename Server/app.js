@@ -10,6 +10,7 @@ import { fileURLToPath } from 'url';
 import { AppError } from './utils/appError.js';
 
 import productRouter from './routers/productRouter.js';
+import userRouter from './routers/userRouter.js'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,6 +29,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/product', productRouter);
+app.use('/api/user', userRouter);
 
 // Catch-all route for unsupported paths
 app.use((req, res, next) => {
