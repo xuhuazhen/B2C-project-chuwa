@@ -1,5 +1,5 @@
 import { catchAsync } from '../utils/catchAsync.js';
-import { Product } from '../models/Product.js';
+import { Product } from '../modles/Product.js';
 
 export const get_products = catchAsync(async (req, res, next) => {
     const products = await Product.find({ isActive: true })

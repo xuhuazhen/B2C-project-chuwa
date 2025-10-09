@@ -18,7 +18,10 @@ const __dirname = path.dirname(__filename);
 
 // Applying middleware
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', // 前端地址
+  credentials: true                
+}));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

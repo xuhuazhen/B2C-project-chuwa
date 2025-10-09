@@ -1,7 +1,7 @@
 import { generateToken } from '../utils/generateToken.js';
 import { AppError } from '../utils/appError.js';
 import { catchAsync } from '../utils/catchAsync.js';
-import { User } from '../models/User.js';
+import { User } from '../modles/User.js';
 import * as argon2 from 'argon2';
 
 export const post_signup = catchAsync(async (req, res, next) => {
@@ -30,7 +30,7 @@ export const post_signup = catchAsync(async (req, res, next) => {
 });
 
 export const post_login = catchAsync(async (req, res, next) => {
-    const {email, password} = req.body;
+    const {email, password} = req.body; 
 
     if (!email || !password) return next(new AppError('Please provide email and password!', 400));
 
@@ -59,12 +59,12 @@ export const post_login = catchAsync(async (req, res, next) => {
     //     }
     // }
     
-    if (!user || !isPwdCorrect) {
+    if (!user || !isPwdCorrect) { 
         return next(new AppError('Incorrect email or password', 401));
     }
 
     const token = generateToken(user._id, user.email, user.role);
-    
+     
     res.cookie('token', token, { httpOnly: true, maxAge: 10800000 });
 
     user.password = undefined;
