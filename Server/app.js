@@ -1,3 +1,4 @@
+// Server/app.js
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -8,9 +9,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { AppError } from './utils/appError.js';
-
 import productRouter from './routers/productRouter.js';
 import userRouter from './routers/userRouter.js'
+import uploadRoutes from './routers/uploadRoutes.js';  
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,7 +21,7 @@ const app = express();
 app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); //parses data sent from HTML forms
+app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, 'public'))); // serve static files
 
@@ -29,13 +30,12 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/product', productRouter);
-app.use('/api/user', userRouter);
+app.use('/api', uploadRoutes);            
+app.use('/api/user', userRouter);                
 
 // Catch-all route for unsupported paths
 app.use((req, res, next) => {
-  next(
-    new AppError('Sorry, we couldn’t find the page you’re looking for.', 404)
-  );
+  next(new AppError('Sorry, we couldn’t find the page you’re looking for.', 404));
 });
 
 export default app;

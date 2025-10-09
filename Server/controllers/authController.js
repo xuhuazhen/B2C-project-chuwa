@@ -2,6 +2,7 @@ import { generateToken } from '../utils/generateToken.js';
 import { AppError } from '../utils/appError.js';
 import { catchAsync } from '../utils/catchAsync.js';
 import { User } from '../models/User.js';
+import * as argon2 from 'argon2';
 
 export const post_signup = catchAsync(async (req, res, next) => {
     const { email, password, role } = req.body; 
@@ -17,7 +18,7 @@ export const post_signup = catchAsync(async (req, res, next) => {
         role
     });
     
-    const token = generateToken(newUser._id, newUser.username, newUser.role);
+    const token = generateToken(newUser._id, newUser.email, newUser.role);
     res.cookie('token', token, { httpOnly: true, maxAge: 10800000 });
 
     newUser.password = undefined;
@@ -38,9 +39,9 @@ export const post_login = catchAsync(async (req, res, next) => {
         .select('+password'); //find user with pwd
 
     if (!user) return next(new AppError('Incorrect email', 401));
-    
+
     let isPwdCorrect = false;
-    isPwdCorrect = await user.correctPassword(user.password, password);
+    isPwdCorrect = await argon2.verify(user.password, password);
     
     // const isHashed = user.password.startsWith('$argon2');
     // if (isHashed) {
