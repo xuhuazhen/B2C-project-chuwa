@@ -1,0 +1,45 @@
+.loginPage {
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+  background-color: #f7f8fa;
+}
+.ant-card {
+  width: 80vw;
+  min-width: 300px;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.ant-card .ant-card-head {
+  border-bottom: none;
+}
+.ant-card .ant-card-head-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+}
+.card-header {
+  display: flex;
+  flex-direction: column;
+}
+.card-header Button {
+   margin-left: auto;
+}
+.login-footer {   
+  display: flex;
+  justify-content: space-between;
+}
+
+.login-footer span { 
+  font-size: 12px;
+}
+
+@media (max-width: 576px) {
+  .login-footer {
+    flex-direction: column;
+    align-items: center; 
+    text-align: center;
+    gap: 5px;
+  }
+}
