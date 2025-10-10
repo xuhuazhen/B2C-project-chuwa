@@ -12,6 +12,7 @@ import { AppError } from './utils/appError.js';
 import productRouter from './routers/productRouter.js';
 import userRouter from './routers/userRouter.js'
 import uploadRoutes from './routers/uploadRoutes.js';  
+import errController from './controllers/errController.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -40,5 +41,6 @@ app.use('/api/user', userRouter);
 app.use((req, res, next) => {
   next(new AppError('Sorry, we couldn’t find the page you’re looking for.', 404));
 });
+app.use(errController);
 
 export default app;

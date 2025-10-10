@@ -1,8 +1,24 @@
-import { generateToken } from '../utils/generateToken.js';
+import { generateToken, generateRestToken } from '../utils/generateToken.js';
 import { AppError } from '../utils/appError.js';
 import { catchAsync } from '../utils/catchAsync.js';
 import { User } from '../modles/User.js';
 import * as argon2 from 'argon2';
+
+export const post_resetPwd = catchAsync(async (req, res, next) => { 
+    const user = await User.findOne(req.body);
+    
+    if (!user)  return next(new AppError('Email not found in our system', 404));
+
+    const resetToken = generateRestToken();
+
+    const resetURL = `http://localhost:5173/forgot-password"/${resetToken}`; //send email link
+    console.log(`Click here: ${resetURL}`);
+
+    res.status(200).json({
+        status: "success",
+        message: "Reset link sent successfully."
+    });
+});
 
 export const post_signup = catchAsync(async (req, res, next) => {
     const { email, password, role } = req.body; 
@@ -73,3 +89,4 @@ export const post_login = catchAsync(async (req, res, next) => {
         data: { user },
     });
 });
+

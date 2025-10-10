@@ -1,59 +1,64 @@
-import { useState } from 'react';
+import { useState } from 'react'; 
 import { useNavigate } from 'react-router-dom';
-import axios from "axios";
+import axios from "axios"; 
 import './style.css';
 import MainLayout from '../../components/UI/mainLayout';
 import {
-  Form,
-  Input,
-  Button,
-  Card,
-  message,
-  Alert
+    Form,
+    Input,
+    Button,
+    Card, 
+    Alert
 } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
-import 'antd/dist/reset.css';
 
-const LoginPage = () => {
+export const ChangePwdPage = () => {
     const [loading, setLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState(''); 
     const [form] = Form.useForm();
+    const [isSent, setIsSent] = useState(false);
+
     const navigate = useNavigate();
-    
-    const handleSubmit = async (values) => { 
+
+    const handleSubmit = async (values) => {
+        console.log(values)
         setLoading(true);
+        setErrorMessage('');
 
         try {
-           const res = await axios.post(
-                "http://localhost:3000/api/user/login",
+            const res = await axios.post(
+                "http://localhost:3000/api/user/forgot-password",
                 values,
-                { withCredentials: true, credentials: "include" }
-            );     
-
-            if (res.data.status === "success") {
-                const user = res.data.data.user;
-                console.log(user);
-            } else { 
-               message.error("Login failed. Please check your credentials and try again.");
+                { withCredentials: true }
+            )
+            if (res.data.status === 'success') {
+                setIsSent(true);
+            } else {
+                setErrorMessage(res.data.message || "Something went wrong, please try again.");
             }
         } catch (err) {
-            if (err.response && err.response.data.message) setErrorMessage(err.response.data.message);
-            else setErrorMessage(err.message); 
+            if (err.response && err.response.data.message) {
+                setErrorMessage(err.response.data.message);
+            } else {
+                setErrorMessage("Unable to send reset link. Please try again later.");
+            }
         } finally {
             setLoading(false);
         }
-  };
-  
+    }
+
+
     return (
         <MainLayout>
-            <div className="loginPage">
-                <Card title={
+            <div className="changePwdPage">
+                { !isSent && <Card title={
                     <div className='card-header'>
                         <Button type="text"
                             icon={<CloseOutlined />}
                             onClick={() => navigate('/')}
                         />        
-                        <span>Sign in to your account</span>
+                        <span>Update your password</span>
+                        <span style={{fontSize: 14, fontWeight: 'normal'}}> Enter your email link, we will send you recovery link</span>
                     </div>
                 } 
                 >
@@ -80,14 +85,6 @@ const LoginPage = () => {
                         >
                             <Input placeholder="Enter your email" />
                         </Form.Item>
-                        <Form.Item name="password"
-                            label="Password"
-                            rules={[
-                                { required: true, message: 'Please enter your password!' }, 
-                            ]}
-                        >
-                        <Input.Password placeholder="Enter your password" />
-                        </Form.Item>
                         <Form.Item>
                             <Button
                                 type="primary"
@@ -99,20 +96,22 @@ const LoginPage = () => {
                             </Button>
                         </Form.Item>
                     </Form>
-                    <div className='login-footer'>
-                        <span style={{marginRight: 10}}>
-                            Don't have an account?{' '}
-                            <a onClick={() => navigate('/signup')}>Sign Up</a>
-                        </span>
-                        <span>
-                            <a onClick={() => navigate('/forget-pwd')}>Forget password?</a>
-                        </span>
-                    </div>
                 </Card>
+                }
+                { isSent && <Card title={
+                    <div className='card-header'>
+                        <Button type="text"
+                            icon={<CloseOutlined />}
+                            onClick={() => navigate('/')}
+                        />        
+                    </div>
+                    }
+                    >
+                    <p>We have sent the update password link to your email, please check that !</p>
+                </Card>
+                }
             </div>
         </MainLayout>
         
   );
 };
-
-export default LoginPage;
