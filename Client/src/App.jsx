@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import CreateProductPage from './pages/createNewProduct'; 
 import LoginPage from './pages/Login/Login'; 
+import SignupPage from './pages/Signup/Signup';
+import { ChangePwdPage } from './pages/ChangePwd/ChangPwd';
 
 function Home() {
   return (
@@ -19,6 +21,8 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/admin/create-product" element={<CreateProductPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/forget-pwd" element={<ChangePwdPage />} />
       </Routes>
     </BrowserRouter>
   );
