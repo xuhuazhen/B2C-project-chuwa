@@ -1,0 +1,53 @@
+.custom-header {
+  background: #fff;
+  padding: 12px 24px;
+  box-shadow: 0 2px 8px #f0f1f2;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.header-icons {
+  display: flex;
+  align-items: center;
+}
+
+.price-text {
+  white-space: nowrap;
+}
+
+.header-search {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Responsive behavior */
+@media (min-width: 768px) {
+  .custom-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .header-top {
+    flex: 1;
+    margin-right: 24px;
+  }
+
+  .header-search {
+    flex: 2;
+    margin: 0;
+  }
+}
