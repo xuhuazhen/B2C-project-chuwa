@@ -35,7 +35,7 @@ export const post_signup = catchAsync(async (req, res, next) => {
     });
     
     const token = generateToken(newUser._id, newUser.email, newUser.role);
-    res.cookie('token', token, { httpOnly: true, maxAge: 10800000 });
+    res.cookie('token', token, { httpOnly: true, maxAge: 10800000 }); //expired after 3hrs
 
     newUser.password = undefined;
 

@@ -10,7 +10,7 @@ import {
     Card, 
     Alert
 } from 'antd';
-import { CloseOutlined } from '@ant-design/icons';
+import { CloseOutlined, MailTwoTone } from '@ant-design/icons';
 
 export const ChangePwdPage = () => {
     const [loading, setLoading] = useState(false);
@@ -107,7 +107,10 @@ export const ChangePwdPage = () => {
                     </div>
                     }
                     >
-                    <p>We have sent the update password link to your email, please check that !</p>
+                    <div className='email-sent-content'>
+                        <MailTwoTone style={{fontSize: 40}}/>
+                        <p>We have sent the update password link to your email, please check that !</p>
+                    </div>
                 </Card>
                 }
             </div>

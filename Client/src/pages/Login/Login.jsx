@@ -14,11 +14,17 @@ import {
 import { CloseOutlined } from '@ant-design/icons';
 import 'antd/dist/reset.css';
 
+import { useDispatch } from 'react-redux';
+import { storeUser } from '../../store/user/userSlice';
+import { storeCartItems } from '../../store/cart/cartSlice';
+
 const LoginPage = () => {
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [form] = Form.useForm();
+    
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     
     const handleSubmit = async (values) => { 
         setLoading(true);
@@ -31,8 +37,10 @@ const LoginPage = () => {
             );     
 
             if (res.data.status === "success") {
-                const user = res.data.data.user;
-                console.log(user);
+                const { cart, ...userInfo } = res.data.data.user;
+                dispatch(storeUser(userInfo));
+                dispatch(storeCartItems(cart));
+                navigate('/');
             } else { 
                message.error("Login failed. Please check your credentials and try again.");
             }
