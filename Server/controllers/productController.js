@@ -13,23 +13,29 @@ export const get_products = catchAsync(async (req, res, next) => {
   });
 });
 
-// GET /api/product/search?q=
 export const get_search = catchAsync(async (req, res, next) => {
-  const query = req.query.q;
-  console.log("Search hit. Query:", query);
+  const query = req.query.q || "";
 
-  if (!query?.trim()) {
-    console.log("Empty query");
-    return res.json([]);
+  if (!query.trim()) {
+    return res.status(200).json({
+      status: "success",
+      products: [],
+    });
   }
 
-  const products = await Product.find(
-    { name: { $regex: query, $options: "i" } },
-    { name: 1 }
-  ).limit(10);
+  const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const regex = new RegExp(escapeRegex(query), "i");
 
   //   console.log("Found products:", products);
-  git;
+
+  const products = await Product.find({
+    name: { $regex: regex },
+    isActive: true,
+  })
+    .limit(10)
+    .select("name -_id")
+    .lean();
+
   res.status(200).json({
     status: "success",
     products,

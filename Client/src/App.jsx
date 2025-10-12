@@ -4,9 +4,9 @@ import CreateProductPage from "./pages/createNewProduct";
 import AppHeader from "./components/header";
 import AppFooter from "./components/footer";
 const { Header, Footer, Sider, Content } = Layout;
-import LoginPage from './pages/Login/Login'; 
-import SignupPage from './pages/Signup/Signup';
-import { ChangePwdPage } from './pages/ChangePwd/ChangPwd';
+import LoginPage from "./pages/Login/Login";
+import SignupPage from "./pages/Signup/Signup";
+import { ChangePwdPage } from "./pages/ChangePwd/ChangPwd";
 
 function Home() {
   return (
@@ -20,6 +20,7 @@ function Home() {
     </Flex>
   );
 }
+<<<<<<< HEAD
 // function Home() {
 //   return (
 //     <div style={{ padding: 24 }}>
@@ -37,6 +38,8 @@ function Home() {
 //   //   </div>
 //   // );
 // }
+=======
+>>>>>>> shunali
 
 export default function App() {
   return (
