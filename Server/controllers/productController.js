@@ -29,7 +29,7 @@ export const get_search = catchAsync(async (req, res, next) => {
   ).limit(10);
 
   //   console.log("Found products:", products);
-
+  git;
   res.status(200).json({
     status: "success",
     products,
