@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Layout,
   AutoComplete,
@@ -15,40 +15,49 @@ import {
 import { UserOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 
 import "./header.css";
+import { Content } from "antd/es/layout/layout";
 
 const { Header } = Layout;
 const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
 
 const AppHeader = () => {
-  // const screens = useBreakpoint();
-  // const isMobile = !screens.md; // mobile if width < 768px
   const [inputValue, setInputValue] = useState("");
   const [options, setOptions] = useState([]);
+  const timeoutRef = useRef(null);
 
+  // Fetch autocomplete options
   const fetchData = async (query) => {
-    if (!query?.trim()) return setOptions([]);
+    if (!query.trim()) return setOptions([]);
+
     try {
       const params = new URLSearchParams({ q: query });
-      const res = await fetch(`/api/search?${params.toString()}`);
-      const data = await res.json();
-
-      setOptions(
-        data.products.map((item) => ({
-          value: item.name,
-        }))
+      // console.log(params.toString())
+      const res = await fetch(
+        `http://localhost:3000/api/product/search?${params.toString()}`
       );
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+      const data = await res.json();
+      // console.log(data)
+
+      if (data.status === "success") {
+        setOptions(data.products.map((p) => ({ value: p.name })));
+      }
     } catch (err) {
-      console.log(err);
+      console.error("Fetch error:", err);
     }
   };
 
+  //Debouncing
   useEffect(() => {
-    const delay = setTimeout(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+    timeoutRef.current = setTimeout(() => {
       fetchData(inputValue);
     }, 300);
 
-    return () => clearTimeout(delay);
+    return () => clearTimeout(timeoutRef.current);
   }, [inputValue]);
 
   const Logo = (
@@ -117,40 +126,3 @@ const AppHeader = () => {
 };
 
 export default AppHeader;
-
-// <Header style={{ backgroundColor: "#111827" }}>
-//   <Row align="middle" justify="space-between">
-//     <Col span={8}>{Logo}</Col>
-//     <Col span={8}>{Search}</Col>
-//     <Col span={8}>{TopBarActions}</Col>
-//   </Row>
-// </Header>;
-
-// <Header className="custom-header">
-//   <div className="header-top-row">
-//     {/* Left: Logo */}
-//     <div className="header-logo">MyStore</div>
-
-//     {/* Right: Icons */}
-//     <Space size="large" className="header-icons">
-//       <Avatar icon={<UserOutlined />} />
-//       <Badge count={2} size="small">
-//         <ShoppingCartOutlined style={{ fontSize: 20 }} />
-//       </Badge>
-//       <Text strong className="header-price">
-//         $123.00
-//       </Text>
-//     </Space>
-//   </div>
-
-//   {/* Bottom row: search bar (only shown on mobile OR adjusted) */}
-//   <div className="header-search">
-//     <AutoComplete
-//       options={options}
-//       onSearch={handleSearch}
-//       style={{ width: "100%" }}
-//     >
-//       <Input.Search allowClear placeholder="Search products..." />
-//     </AutoComplete>
-//   </div>
-// </Header>

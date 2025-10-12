@@ -4,9 +4,9 @@ import CreateProductPage from "./pages/createNewProduct";
 import AppHeader from "./components/header";
 import AppFooter from "./components/footer";
 const { Header, Footer, Sider, Content } = Layout;
-import LoginPage from './pages/Login/Login'; 
-import SignupPage from './pages/Signup/Signup';
-import { ChangePwdPage } from './pages/ChangePwd/ChangPwd';
+import LoginPage from "./pages/Login/Login";
+import SignupPage from "./pages/Signup/Signup";
+import { ChangePwdPage } from "./pages/ChangePwd/ChangPwd";
 
 function Home() {
   return (
@@ -19,24 +19,7 @@ function Home() {
       </Layout>
     </Flex>
   );
-
-// function Home() {
-//   return (
-//     <div style={{ padding: 24 }}>
-//       <h1>Home Page</h1>
-//       <p><Link to="/admin/create-product">Go to Create Product Page</Link></p>
-//       <p><Link to="/login">Go to login Page</Link></p>
-//     </div>
-//   );
-//   // return (
-//   //   <div style={{ padding: 24 }}>
-//   //     <h1>Home Page</h1>
-//   //     <p>
-//   //       <Link to="/admin/create-product">Go to Create Product Page</Link>
-//   //     </p>
-//   //   </div>
-//   // );
-// }
+}
 
 export default function App() {
   return (
