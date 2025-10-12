@@ -20,7 +20,6 @@ function Home() {
     </Flex>
   );
 }
-<<<<<<< HEAD
 // function Home() {
 //   return (
 //     <div style={{ padding: 24 }}>
@@ -38,8 +37,6 @@ function Home() {
 //   //   </div>
 //   // );
 // }
-=======
->>>>>>> shunali
 
 export default function App() {
   return (
