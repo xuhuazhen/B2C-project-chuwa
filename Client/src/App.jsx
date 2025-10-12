@@ -19,7 +19,7 @@ function Home() {
       </Layout>
     </Flex>
   );
-
+}
 // function Home() {
 //   return (
 //     <div style={{ padding: 24 }}>
