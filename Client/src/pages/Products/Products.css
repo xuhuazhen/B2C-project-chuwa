@@ -1,0 +1,15 @@
+.ant-card .ant-card-body {
+  padding: 6px 12px;
+}
+
+.ant-card .ant-card-meta-title {
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.ant-card .ant-card-meta-description {
+  color: #111827;
+  font-size: 16px;
+  font-weight: 600;
+}
