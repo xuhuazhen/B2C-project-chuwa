@@ -13,6 +13,7 @@ export const get_products = catchAsync(async (req, res, next) => {
   });
 });
 
+//Return Search Results
 export const get_search = catchAsync(async (req, res, next) => {
   const query = req.query.q || "";
 
@@ -26,18 +27,19 @@ export const get_search = catchAsync(async (req, res, next) => {
   const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const regex = new RegExp(escapeRegex(query), "i");
 
-  //   console.log("Found products:", products);
-
   const products = await Product.find({
-    name: { $regex: regex },
-    isActive: true,
+    $or: [
+      { name: { $regex: regex } },
+      { description: { $regex: regex } },
+      { category: { $regex: regex } },
+    ],
   })
     .limit(10)
-    .select("name -_id")
-    .lean();
+    .lean(); // Keep lean() for performance (returns plain JS objects)
 
   res.status(200).json({
     status: "success",
+    results: products.length,
     products,
   });
 });
