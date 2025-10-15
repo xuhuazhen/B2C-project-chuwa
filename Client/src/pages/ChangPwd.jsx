@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios"; 
 import './style.css';
-import MainLayout from '../../components/UI/mainLayout';
+import MainLayout from '../components/UI/mainLayout';
 import {
     Form,
     Input,
@@ -50,7 +50,7 @@ export const ChangePwdPage = () => {
 
     return (
         <MainLayout>
-            <div className="changePwdPage">
+            <div className="authPage">
                 { !isSent && <Card title={
                     <div className='card-header'>
                         <Button type="text"

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Form, Card, Input, Button, Switch, Alert } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
-import MainLayout from '../../components/UI/mainLayout'; 
+import MainLayout from '../components/UI/mainLayout'; 
 
 const SignupPage =  () => {
     const [loading, setLoading] = useState(false);
@@ -39,7 +39,7 @@ const SignupPage =  () => {
     
     return (
             <MainLayout>
-                <div className="signupPage">
+                <div className="authPage">
                     <Card title={
                         <div className='card-header'>
                             <Button type="text"

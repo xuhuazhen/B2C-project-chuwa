@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import './style.css';
-import MainLayout from '../../components/UI/mainLayout';
+import MainLayout from '../components/UI/mainLayout';
 import {
   Form,
   Input,
@@ -15,8 +15,8 @@ import { CloseOutlined } from '@ant-design/icons';
 import 'antd/dist/reset.css';
 
 import { useDispatch } from 'react-redux';
-import { storeUser } from '../../store/user/userSlice';
-import { storeCartItems } from '../../store/cart/cartSlice';
+import { storeUser } from '../store/user/userSlice';
+import { storeCartItems } from '../store/cart/cartSlice';
 
 const LoginPage = () => {
     const [loading, setLoading] = useState(false);
@@ -40,7 +40,7 @@ const LoginPage = () => {
                 const { cart, ...userInfo } = res.data.data.user;
                 dispatch(storeUser(userInfo));
                 dispatch(storeCartItems(cart));
-                navigate('/');
+                //navigate('/');
             } else { 
                message.error("Login failed. Please check your credentials and try again.");
             }
@@ -54,7 +54,7 @@ const LoginPage = () => {
   
     return (
         <MainLayout>
-            <div className="loginPage">
+            <div className="authPage">
                 <Card title={
                     <div className='card-header'>
                         <Button type="text"

@@ -1,6 +1,8 @@
 import React from 'react';
-import { Layout } from 'antd';
-import { ShoppingOutlined } from '@ant-design/icons';
+import { Layout, Button } from 'antd';
+import { ShoppingOutlined,
+  ShoppingCartOutlined,
+} from '@ant-design/icons';
 
 const { Header, Content, Footer } = Layout;
 
@@ -9,6 +11,11 @@ export default function MainLayout({ children }) {
     <Layout style={{ minHeight: '100vh' }}>
       <Header style={{ color: 'white', fontSize: 18 }}>
         <ShoppingOutlined /> Product Management
+        <Button 
+          icon={<ShoppingCartOutlined/>}
+        >
+          $0.0
+        </Button>
       </Header>
 
       <Content style={{ padding: '50px', flex: 1 }}>

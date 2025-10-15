@@ -51,7 +51,7 @@ export const post_login = catchAsync(async (req, res, next) => {
     if (!email || !password) return next(new AppError('Please provide email and password!', 400));
 
     const user = await User.findOne({email})
-        .populate('cart')
+        .populate('cart.product') // get cartitems' info
         .select('+password'); //find user with pwd
 
     if (!user) return next(new AppError('Incorrect email', 401));
