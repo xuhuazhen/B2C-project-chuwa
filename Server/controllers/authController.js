@@ -1,12 +1,24 @@
 import { generateToken, generateRestToken } from '../utils/generateToken.js';
 import { AppError } from '../utils/appError.js';
 import { catchAsync } from '../utils/catchAsync.js';
-import { User } from '../modles/User.js';
+import { User } from '../models/User.js';
 import * as argon2 from 'argon2';
 
+export const get_logout = catchAsync(async (req, res, next) => {
+  res.cookie('token', 'loggedout', {
+    expires: new Date(Date.now() - 10 * 1000), // Set the cookie to expire in the past
+    maxAge: 0, // Expires immediately
+    httpOnly: true, // Accessible only by the web server
+    path: '/',
+  });
+  res.status(200).json({ status: 'success' });
+});
+
+
 export const post_resetPwd = catchAsync(async (req, res, next) => { 
-    const user = await User.findOne(req.body);
-    
+    const user = await User.findOne(req.body);  
+    console.log('reset');
+
     if (!user)  return next(new AppError('Email not found in our system', 404));
 
     const resetToken = generateRestToken();

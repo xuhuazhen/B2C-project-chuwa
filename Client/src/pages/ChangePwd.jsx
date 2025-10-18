@@ -1,6 +1,5 @@
 import { useState } from 'react'; 
-import { useNavigate } from 'react-router-dom';
-import axios from "axios"; 
+import { useNavigate } from 'react-router-dom'; 
 import './style.css';
 import MainLayout from '../components/UI/mainLayout';
 import {
@@ -11,8 +10,9 @@ import {
     Alert
 } from 'antd';
 import { CloseOutlined, MailTwoTone } from '@ant-design/icons';
+import api from '../api';
 
-export const ChangePwdPage = () => {
+const ChangePwdPage = () => {
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState(''); 
     const [form] = Form.useForm();
@@ -26,8 +26,7 @@ export const ChangePwdPage = () => {
         setErrorMessage('');
 
         try {
-            const res = await axios.post(
-                "http://localhost:3000/api/user/forgot-password",
+            const res = await api.post( "user/forgot-password",
                 values,
                 { withCredentials: true }
             )
@@ -118,3 +117,5 @@ export const ChangePwdPage = () => {
         
   );
 };
+
+export default ChangePwdPage;

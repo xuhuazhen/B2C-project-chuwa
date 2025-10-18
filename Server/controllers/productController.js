@@ -1,5 +1,5 @@
 import { catchAsync } from "../utils/catchAsync.js";
-import { Product } from "../modles/Product.js";
+import { Product } from "../models/Product.js";
 
 export const get_products = catchAsync(async (req, res, next) => {
   const products = await Product.find({ isActive: true }).sort({
@@ -13,25 +13,33 @@ export const get_products = catchAsync(async (req, res, next) => {
   });
 });
 
-// GET /api/product/search?q=
+//Return Search Results
 export const get_search = catchAsync(async (req, res, next) => {
-  const query = req.query.q;
-  console.log("Search hit. Query:", query);
+  const query = req.query.q || "";
 
-  if (!query?.trim()) {
-    console.log("Empty query");
-    return res.json([]);
+  if (!query.trim()) {
+    return res.status(200).json({
+      status: "success",
+      products: [],
+    });
   }
 
-  const products = await Product.find(
-    { name: { $regex: query, $options: "i" } },
-    { name: 1 }
-  ).limit(10);
+  const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const regex = new RegExp(escapeRegex(query), "i");
 
-  //   console.log("Found products:", products);
+  const products = await Product.find({
+    $or: [
+      { name: { $regex: regex } },
+      { description: { $regex: regex } },
+      { category: { $regex: regex } },
+    ],
+  })
+    .limit(10)
+    .lean(); // Keep lean() for performance (returns plain JS objects)
 
   res.status(200).json({
     status: "success",
+    results: products.length,
     products,
   });
 });

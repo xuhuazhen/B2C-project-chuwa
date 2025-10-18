@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from "axios";
+import { useNavigate } from 'react-router-dom'; 
 import './style.css';
 import MainLayout from '../components/UI/mainLayout';
 import {
@@ -14,9 +13,12 @@ import {
 import { CloseOutlined } from '@ant-design/icons';
 import 'antd/dist/reset.css';
 
+import store from "../store/store";
 import { useDispatch } from 'react-redux';
 import { storeUser } from '../store/user/userSlice';
 import { storeCartItems } from '../store/cart/cartSlice';
+import api from '../api';
+import { updateCartThunk } from '../store/cart/cartThunk';
 
 const LoginPage = () => {
     const [loading, setLoading] = useState(false);
@@ -25,13 +27,14 @@ const LoginPage = () => {
     
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const curCart = store.getState().cart.items;
     
     const handleSubmit = async (values) => { 
         setLoading(true);
 
         try {
-           const res = await axios.post(
-                "http://localhost:3000/api/user/login",
+           const res = await api.post(
+                "user/login",
                 values,
                 { withCredentials: true, credentials: "include" }
             );     
@@ -39,8 +42,15 @@ const LoginPage = () => {
             if (res.data.status === "success") {
                 const { cart, ...userInfo } = res.data.data.user;
                 dispatch(storeUser(userInfo));
-                dispatch(storeCartItems(cart));
-                //navigate('/');
+
+                // 如果未登录前添加购物车
+                if ( curCart.length !== 0 && cart.length == 0 ) {
+                    dispatch(updateCartThunk(curCart));
+                } else {
+                    dispatch(storeCartItems(cart)); //后期可修改成merge cart
+                }
+                
+                navigate('/');
             } else { 
                message.error("Login failed. Please check your credentials and try again.");
             }
