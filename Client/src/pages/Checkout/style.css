@@ -1,0 +1,66 @@
+.content-drawer {
+    position: 'absolute'
+}
+
+.ant-drawer .ant-drawer-content-wrapper {
+    width: 40% !important; /* 小屏幕全屏 Drawer */
+}
+
+.ant-drawer .ant-drawer-body {
+    padding: 0;
+}
+.drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: rgb(166, 105, 245); 
+} 
+Title {
+  color:white;
+}
+.promo-code-container {
+    margin: 12px;
+}
+.promo-code-container .ant-form {
+  display: flex;
+  align-items: center;
+  gap: 12px; 
+  flex-wrap: wrap; 
+  justify-content: space-between;
+}
+.promo-code-container .ant-form-item {
+  flex: 1; /* 输入框占满剩余宽度 */
+  margin-bottom: 0; /* 去掉 form item 默认的底部间距 */
+}
+
+.promo-code-container .ant-input {
+    min-width: 150px;
+  width: 100%; /* 让输入框根据容器宽度自适应 */
+}
+.promo-code-container Button {
+    background-color: rgb(166, 105, 245); 
+    color: white; 
+    flex-shrink: 0; /* 防止按钮被挤压 */
+}
+.cart-footer {
+    margin: 12px;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+}
+.cart-footer Button {
+    background-color: rgb(166, 105, 245); 
+    color: white;
+    width: 100%;
+}
+.check-out-text {
+    display: flex;
+    justify-content: space-between;
+}
+/* 小屏幕 */
+@media (max-width: 425px) {
+  .ant-drawer .ant-drawer-content-wrapper {
+    width: 100% !important; /* 小屏幕全屏 Drawer */
+  }
+}
