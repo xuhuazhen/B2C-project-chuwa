@@ -4,8 +4,9 @@ import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import { useSelector, useDispatch } from "react-redux";
 import {
   addToCart,
-  decrementItemQuantity,
-  incrementItemQuantity,
+  updateQuantity,
+  // decrementItemQuantity,
+  // incrementItemQuantity,
 } from "../store/cart/cartSlice";
 import { makeSelectCartItemById } from "../store/cart/selectors";
 import Button from "../components/Button";
@@ -27,13 +28,22 @@ const ProductCard = React.memo(({ product }) => {
     console.log(product);
   };
 
-  const incrementHandler = () => {
-    dispatch(incrementItemQuantity(product._id));
-    console.log(product._id);
+  // const incrementHandler = () => {
+  //   dispatch(incrementItemQuantity(product._id));
+  //   console.log(product._id);
+  // };
+  // const decrementHandler = () => {
+  //   dispatch(decrementItemQuantity(product._id));
+  // };
+
+    const handleQuantity = (qty) => {
+    if (qty < 0) {
+      //message.warning('Quantity cannot be 0'); 
+      return;
+    }
+    dispatch(updateQuantity({productId: product._id, quantity: qty})); 
   };
-  const decrementHandler = () => {
-    dispatch(decrementItemQuantity(product._id));
-  };
+
   return (
     <Card
       style={{ border: "1px solid #CCC", borderRadius: "4px", width: "100%" }}
@@ -98,9 +108,9 @@ const ProductCard = React.memo(({ product }) => {
       >
         {cartItem ? (
           <Button size="small" style={{ width: "110px" }}>
-            <MinusOutlined onClick={decrementHandler} />
+            <MinusOutlined onClick={() => handleQuantity(cartItem.quantity - 1)} />
             <span>{cartItem?.quantity || 0}</span>
-            <PlusOutlined onClick={incrementHandler} />
+            <PlusOutlined onClick={() => handleQuantity(cartItem.quantity + 1)} />
           </Button>
         ) : (
           <Button

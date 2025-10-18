@@ -60,6 +60,7 @@ export default function Products() {
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   const currentProducts = sortedProducts.slice(startIndex, endIndex);
+  console.log("currentProducts:", currentProducts);
 
   const handleSortChange = ({ key }) => {
     if (key === "1") setSort("Price: low to high");
@@ -136,8 +137,8 @@ export default function Products() {
 
       <div className="product-grid">
         {currentProducts.map((product) => (
-          <div className="product-item">
-            <ProductCard key={product._id} product={product} />
+          <div className="product-item" key={product._id}>
+            <ProductCard product={product} />
           </div>
         ))}
       </div>
