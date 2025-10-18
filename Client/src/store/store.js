@@ -1,15 +1,17 @@
 import { configureStore } from "@reduxjs/toolkit";
 import userReducer from "./user/userSlice";
-// import productReducer from "./product/productSlice";
+import productsReducer from "./product/productsSlice";
 import cartReducer from "./cart/cartSlice";
+import searchReducer from "./search/searchSlice";
 
 const store = configureStore({
   reducer: {
     user: userReducer,
     cart: cartReducer,
- // products: productReducer,
+    products: productsReducer,
+    search: searchReducer,
   },
-  devTools: true, 
+  devTools: true,
 });
 
 export default store;

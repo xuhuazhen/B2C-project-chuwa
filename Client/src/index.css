@@ -4,7 +4,7 @@
 /*-------- VARIABLES --------*/
 :root {
   /*-------- COLORS --------*/
-  --container-color: rgba(249, 250, 251, 1);
+  /* --container-color: rgba(249, 250, 251, 1);
   --body-color: rgba(204, 204, 204, 1);
   --header-color: rgba(17, 24, 39, 1);
   --footer-color: rgba(17, 24, 39, 1);
@@ -13,22 +13,22 @@
   --text-color-dark: rgba(17, 24, 39, 1);
   --text-color: rgba(107, 114, 128, 1);
   --text-color-light: rgba(151, 151, 151, 1);
-  --text-color-white: rgba(255, 255, 255, 1);
+  --text-color-white: rgba(255, 255, 255, 1); */
 
   /*-------- FONTS and TYPOGRAPHY --------*/
-  --body-font: "Inter", sans-serif;
+  /* --body-font: "Inter", sans-serif; */
 
   /*  1rem = 10px  */
-  --h4-font-size: 3.2rem;
+  /* --h4-font-size: 3.2rem;
   --normal-font-size: 1.6rem;
   --small-font-size: 1.4rem;
-  --tiny-font-size: 1rem;
+  --tiny-font-size: 1rem; */
 
   /*-------- FONTS WEIGTH --------*/
-  --font-bold: 700;
+  /* --font-bold: 700;
   --font-semi-bold: 600;
   --font-medium: 500;
-  --font-normal: 400;
+  --font-normal: 400; */
 }
 
 * {
@@ -40,4 +40,16 @@
 html {
   /* To make 1rem equals to 10px / 16px = 0.625 = 62.5% */
   font-size: 62.5%;
+}
+
+.button {
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 4px;
+  padding: 8px 20px;
+  background-color: #5048e5;
+  color: #fff;
+  border: 1px solid #5048e5;
+  transition: background-color 0.2s;
+  cursor: pointer;
 }
