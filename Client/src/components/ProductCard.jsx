@@ -1,18 +1,17 @@
 import React from "react";
 import { Card } from "antd";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
-import { useSelector, useDispatch } from "react-redux";
-import {
-  addToCart,
-  updateQuantity,
-  // decrementItemQuantity,
-  // incrementItemQuantity,
-} from "../store/cart/cartSlice";
+import { useSelector } from "react-redux"; 
 import { makeSelectCartItemById } from "../store/cart/selectors";
 import Button from "../components/Button";
+import  { useDebouncedCartSync }  from '../hooks/useDebouncedCartSync'
+import store from '../store/store'
 
 const ProductCard = React.memo(({ product }) => {
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
+
+  const userId = store.getState().user.curUser?._id;
+  const { handleAdd, handleQuantity } = useDebouncedCartSync(userId);
 
   //Create a memoized selector for this product
   const selectCartItem = React.useMemo(
@@ -23,10 +22,10 @@ const ProductCard = React.memo(({ product }) => {
   //Subscribe to only this cart item
   const cartItem = useSelector(selectCartItem);
 
-  const addToCartHandler = () => {
-    dispatch(addToCart(product));
-    console.log(product);
-  };
+  // const addToCartHandler = () => {
+  //   dispatch(addToCart(product));
+  //   console.log(product);
+  // };
 
   // const incrementHandler = () => {
   //   dispatch(incrementItemQuantity(product._id));
@@ -36,13 +35,9 @@ const ProductCard = React.memo(({ product }) => {
   //   dispatch(decrementItemQuantity(product._id));
   // };
 
-    const handleQuantity = (qty) => {
-    if (qty < 0) {
-      //message.warning('Quantity cannot be 0'); 
-      return;
-    }
-    dispatch(updateQuantity({productId: product._id, quantity: qty})); 
-  };
+  const editProduct = () => {
+    console.log('navigate to product detail');
+  }
 
   return (
     <Card
@@ -108,14 +103,14 @@ const ProductCard = React.memo(({ product }) => {
       >
         {cartItem ? (
           <Button size="small" style={{ width: "110px" }}>
-            <MinusOutlined onClick={() => handleQuantity(cartItem.quantity - 1)} />
+            <MinusOutlined onClick={() => handleQuantity(product._id, cartItem.quantity - 1)} />
             <span>{cartItem?.quantity || 0}</span>
-            <PlusOutlined onClick={() => handleQuantity(cartItem.quantity + 1)} />
+            <PlusOutlined onClick={() => handleQuantity(product._id, cartItem.quantity + 1)} />
           </Button>
         ) : (
           <Button
             size="small"
-            onClick={addToCartHandler}
+            onClick={() => handleAdd(product)}
             style={{ width: "110px" }}
           >
             Add
@@ -129,7 +124,7 @@ const ProductCard = React.memo(({ product }) => {
             color: "#535353",
             border: "1px solid #CCC",
           }}
-          onClick={addToCartHandler}
+          onClick={editProduct}
         >
           Edit
         </Button>
