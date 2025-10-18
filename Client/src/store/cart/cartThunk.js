@@ -10,16 +10,18 @@ export const updateCartThunk = createAsyncThunk(
         product: item.product._id,
         quantity: item.quantity
       }));
+      console.log('cart to update:', curCart);
 
       const res = await api.patch(
         `user/shopping-cart/${userId}`,
         { cart: curCart },
         { withCredentials: true }
       );
-
+      console.log('updated cart:', res.data.data.cart);
       return res.data.data.cart;
     } catch (err) {
       // 回滚到 prev snapshot
+      console.log('回滚');
       dispatch(storeCartItems(prevCart));
       return rejectWithValue(err.response?.data?.message || err.message);
     }

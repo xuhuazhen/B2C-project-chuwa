@@ -36,9 +36,12 @@ export const post_validateCode = catchAsync(async (req, res, next) => {
 export const post_shoppingCart = catchAsync(async (req, res, next) => {
     const id = req.params.id;
     const { cart } = req.body;
-    
-    const user = await User.findByIdAndUpdate(id, { cart }).populate('cart.product');
-    
+    const user = await User.findByIdAndUpdate(
+        id,
+        { cart },
+        { new: true, runValidators: true } //cannot less than minumn value(1)
+        ).populate('cart.product');
+        
     if (!user) return next(new AppError('No user found', 404));
 
     res.status(201).json({
