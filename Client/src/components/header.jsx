@@ -4,14 +4,14 @@ import { UserOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import SearchProduct from "./SearchBar";
 import "./header.css";
 import { useSelector } from "react-redux";
+import { subTotalPrice, totalCartItem } from '../store/cart/cartSelectors';
 
 const { Header } = Layout;
 const { Text } = Typography;
 
-const AppHeader = () => {
-  const count = useSelector((store) =>
-    store.cart.items.reduce((acc, cur) => acc + cur.quantity, 0)
-  );
+const AppHeader = ({setOpen}) => {
+  const count = useSelector(totalCartItem);
+  const subTotal = useSelector(subTotalPrice);
 
   return (
     <Header style={{ backgroundColor: "#111827" }} className="header">
@@ -30,7 +30,7 @@ const AppHeader = () => {
           <Text className="action-text">Sign In</Text>
         </div>
 
-        <div className="cart-info">
+        <div className="cart-info" onClick={()=>setOpen(true)}>
           <Badge count={count} size="small" offset={[-4, 5]}>
             <ShoppingCartOutlined
               role="button"
@@ -39,7 +39,7 @@ const AppHeader = () => {
             />
           </Badge>
           <Text strong className="action-text">
-            $13.00
+            $ {subTotal}
           </Text>
         </div>
       </div>

@@ -49,7 +49,7 @@ const CheckoutPage = ({open, onClose}) => {
         }
 
         try {
-            const action = await dispatch(validatePromoCodeThunk(codeInput));
+            const action = dispatch(validatePromoCodeThunk(codeInput));
 
             if (validatePromoCodeThunk.rejected.match(action)) { 
                 setValidateStatus('error');
