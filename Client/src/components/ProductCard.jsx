@@ -1,0 +1,131 @@
+import React from "react";
+import { Card } from "antd";
+import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  addToCart,
+  decrementItemQuantity,
+  incrementItemQuantity,
+} from "../store/cart/cartSlice";
+import { makeSelectCartItemById } from "../store/cart/selectors";
+import Button from "../components/Button";
+
+const ProductCard = React.memo(({ product }) => {
+  const dispatch = useDispatch();
+
+  //Create a memoized selector for this product
+  const selectCartItem = React.useMemo(
+    () => makeSelectCartItemById(product._id),
+    [product._id]
+  );
+
+  //Subscribe to only this cart item
+  const cartItem = useSelector(selectCartItem);
+
+  const addToCartHandler = () => {
+    dispatch(addToCart(product));
+    console.log(product);
+  };
+
+  const incrementHandler = () => {
+    dispatch(incrementItemQuantity(product._id));
+    console.log(product._id);
+  };
+  const decrementHandler = () => {
+    dispatch(decrementItemQuantity(product._id));
+  };
+  return (
+    <Card
+      style={{ border: "1px solid #CCC", borderRadius: "4px", width: "100%" }}
+      styles={{
+        cover: {
+          padding: "12px",
+        },
+        body: {
+          padding: "0 12px 0 12px",
+        },
+        actions: {
+          borderTop: "none",
+        },
+      }}
+      hoverable
+      cover={
+        <img
+          src={product.imageURL}
+          style={{
+            height: 198,
+            objectFit: "cover",
+            borderRadius: 0,
+          }}
+        />
+      }
+    >
+      <div style={{ margin: 0, lineHeight: 1.2 }}>
+        <div
+          style={{
+            margin: 0,
+            fontWeight: 400,
+            fontSize: 14,
+            color: "#6B7280",
+            lineHeight: 1.2,
+          }}
+        >
+          {product.name}
+        </div>
+
+        <div
+          style={{
+            margin: "3px 0 0 0",
+            fontWeight: 600,
+            fontSize: 16,
+            color: "#111827",
+            lineHeight: 1.2,
+          }}
+        >
+          $ {product.price}
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "6px",
+          fontSize: "10px",
+          padding: "12px 0",
+        }}
+      >
+        {cartItem ? (
+          <Button size="small" style={{ width: "110px" }}>
+            <MinusOutlined onClick={decrementHandler} />
+            <span>{cartItem?.quantity || 0}</span>
+            <PlusOutlined onClick={incrementHandler} />
+          </Button>
+        ) : (
+          <Button
+            size="small"
+            onClick={addToCartHandler}
+            style={{ width: "110px" }}
+          >
+            Add
+          </Button>
+        )}
+        <Button
+          size="small"
+          style={{
+            width: "110px",
+            backgroundColor: "#fff",
+            color: "#535353",
+            border: "1px solid #CCC",
+          }}
+          onClick={addToCartHandler}
+        >
+          Edit
+        </Button>
+      </div>
+    </Card>
+  );
+});
+
+export default ProductCard;

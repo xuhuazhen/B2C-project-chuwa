@@ -13,21 +13,11 @@ export default function MainLayout({ children }) {
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      <Header style={{ color: "white", fontSize: 18 }}>
+      {/* <Header style={{ color: "white", fontSize: 18 }}>
         <ShoppingOutlined /> Product Management
-        <Button 
-          icon={<ShoppingCartOutlined/>} 
-          onClick={()=>setOpen(true)}
-        >
-          $0.0
-        </Button>
-      </Header>
-      {/* <AppHeader /> */}
-      <Content style={{ padding: '24px', background: '#f0f2f5', position: 'relative', flex: 1 }}>
-        {children}
-        
-        <CheckoutPage open={open} onClose={() => {setOpen(false)}} />
-      </Content>
+      </Header> */}
+      <AppHeader />
+      <Content style={{ padding: "50px", flex: 1 }}>{children}</Content>
       <AppFooter />
     </Layout>
   );

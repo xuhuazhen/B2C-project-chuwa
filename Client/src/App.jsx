@@ -4,10 +4,10 @@ import CreateProductPage from "./pages/createNewProduct";
 import AppHeader from "./components/header";
 import AppFooter from "./components/footer";
 const { Header, Footer, Sider, Content } = Layout;
-import LoginPage from './pages/Login';
-import SignupPage from './pages/Signup';
-import ChangePwdPage from './pages/ChangePwd';
-// import Products from "./pages/Products/Products";
+import LoginPage from "./pages/Login/Login";
+import SignupPage from "./pages/Signup/Signup";
+import { ChangePwdPage } from "./pages/ChangePwd/ChangPwd";
+import Products from "./pages/Products/ProductsList";
 
 function Home() {
   return (
@@ -15,7 +15,6 @@ function Home() {
       <Layout>
         <AppHeader />
         <Content>Content</Content>
-        {/* <Footer>Footer</Footer> */}
         <AppFooter></AppFooter>
       </Layout>
     </Flex>
@@ -43,7 +42,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" />
+        <Route path="/" element={<Products />} />
         <Route path="/admin/create-product" element={<CreateProductPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />

@@ -21,7 +21,7 @@ const iconsStyles = {
 
 const FooterComponent = () => {
   const screens = useBreakpoint();
-  const isMobile = !screens.md; // mobile if width < 768px
+  const isMobile = !screens.md; //mobile if width < 768px
 
   const Copyright = (
     <Text
