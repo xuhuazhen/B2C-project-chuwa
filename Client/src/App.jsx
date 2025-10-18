@@ -4,10 +4,10 @@ import CreateProductPage from "./pages/createNewProduct";
 import AppHeader from "./components/header";
 import AppFooter from "./components/footer";
 const { Header, Footer, Sider, Content } = Layout;
-import LoginPage from "./pages/Login/Login";
-import SignupPage from "./pages/Signup/Signup";
-import { ChangePwdPage } from "./pages/ChangePwd/ChangPwd";
-import Products from "./pages/Products/Products";
+import LoginPage from './pages/Login';
+import SignupPage from './pages/Signup';
+import ChangePwdPage from './pages/ChangePwd';
+// import Products from "./pages/Products/Products";
 
 function Home() {
   return (

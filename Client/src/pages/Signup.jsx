@@ -1,10 +1,10 @@
 import './style.css';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; 
 import { Form, Card, Input, Button, Switch, Alert } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
-import MainLayout from '../../components/UI/mainLayout'; 
+import MainLayout from '../components/UI/mainLayout'; 
+import api from '../api';
 
 const SignupPage =  () => {
     const [loading, setLoading] = useState(false);
@@ -16,8 +16,7 @@ const SignupPage =  () => {
         setLoading(true); 
 
         try {
-           const res = await axios.post(
-                "http://localhost:3000/api/user/signup",
+           const res = await api.post( "user/signup",
                 { 
                   ...values,  role: values.role ? 'admin' : 'user'
                 },
@@ -39,7 +38,7 @@ const SignupPage =  () => {
     
     return (
             <MainLayout>
-                <div className="signupPage">
+                <div className="authPage">
                     <Card title={
                         <div className='card-header'>
                             <Button type="text"
