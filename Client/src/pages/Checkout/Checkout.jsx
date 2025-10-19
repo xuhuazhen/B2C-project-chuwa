@@ -49,15 +49,11 @@ const CheckoutPage = ({open, onClose}) => {
         }
 
         try {
-            const action = dispatch(validatePromoCodeThunk(codeInput));
-
-            if (validatePromoCodeThunk.rejected.match(action)) { 
-                setValidateStatus('error');
-                setHelpText(action.payload?.message);
-            }   
-        } catch {
+            await dispatch(validatePromoCodeThunk(codeInput)).unwrap(); 
+        } catch(err) {
+            console.log(err);
             setValidateStatus('error');
-            setHelpText('Something went wrong');
+            setHelpText(err.message || 'Something went wrong');
         }
     };
 
@@ -125,19 +121,19 @@ const CheckoutPage = ({open, onClose}) => {
         <div className='cart-footer'>
             <div className='check-out-text'>
                 <p>Subtotal</p>
-                <p>${subtotal}</p>
+                <p>${parseFloat(subtotal).toFixed(2)}</p>
             </div>
             <div className='check-out-text'>
                 <p>Tax</p>
-                <p>${tax}</p>
+                <p>${parseFloat(tax).toFixed(2)}</p>
             </div>
             <div className='check-out-text'>
                 <p>Discount</p>
-                <p>{ (discount && discount> 0) ? ('-$'+ discount) : '--'}</p>
+                <p>{ (discount && discount> 0) ? ('-$'+ parseFloat(discount).toFixed(2)) : '--'}</p>
             </div>
             <div className='check-out-text'>
                 <p>Estimated total</p>
-                <p>${total}</p>
+                <p>${parseFloat(total).toFixed(2)}</p>
             </div>
             <Button size='large'> Continue to checkout </Button>
         </div>

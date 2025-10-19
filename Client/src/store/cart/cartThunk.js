@@ -32,10 +32,9 @@ export const validatePromoCodeThunk = createAsyncThunk(
   'cart/validatePromoCode',
   async(code, { rejectWithValue }) => {
     try {
-      const res = await api.post('user/validatePromoCode', { code });
-      console.log(res.data.data);
+      const res = await api.post('user/validatePromoCode', { code }); 
       return res.data.data;   //code and discountRate
-    } catch (err) {
+    } catch (err) { 
       return rejectWithValue({
         code: null,
         discountRate: 0,

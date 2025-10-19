@@ -1,12 +1,10 @@
 import React from 'react'; 
 import './cartItemCard.css';
-import { Card, Button } from 'antd'; 
-import store from "../../store/store"; 
+import { Card, Button } from 'antd';   
 import { useDebouncedCartSync } from '../../hooks/useDebouncedCartSync';
 
-export const CartItemCard = ({ item }) => { 
-    const userId = store.getState().user.curUser?._id; 
-    const { handleQuantity, handleRemove } = useDebouncedCartSync(userId);
+export const CartItemCard = ({ item }) => {  
+    const { handleQuantity, handleRemove } = useDebouncedCartSync();
  
     return (
         <Card size='small' className='cart-card'>

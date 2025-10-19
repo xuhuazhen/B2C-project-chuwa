@@ -4,14 +4,12 @@ import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import { useSelector } from "react-redux"; 
 import { makeSelectCartItemById } from "../store/cart/selectors";
 import Button from "../components/Button";
-import  { useDebouncedCartSync }  from '../hooks/useDebouncedCartSync'
-import store from '../store/store'
+import  { useDebouncedCartSync }  from '../hooks/useDebouncedCartSync' 
 
 const ProductCard = React.memo(({ product }) => {
   // const dispatch = useDispatch();
-
-  const userId = store.getState().user.curUser?._id;
-  const { handleAdd, handleQuantity } = useDebouncedCartSync(userId);
+  const userRole = useSelector(state => state.user.curUser?.role);
+  const { handleAdd, handleQuantity } = useDebouncedCartSync();
 
   //Create a memoized selector for this product
   const selectCartItem = React.useMemo(
@@ -116,18 +114,20 @@ const ProductCard = React.memo(({ product }) => {
             Add
           </Button>
         )}
-        <Button
-          size="small"
-          style={{
-            width: "110px",
-            backgroundColor: "#fff",
-            color: "#535353",
-            border: "1px solid #CCC",
-          }}
-          onClick={editProduct}
-        >
-          Edit
-        </Button>
+        { userRole === 'hr' &&
+          <Button
+            size="small"
+            style={{
+              width: "110px",
+              backgroundColor: "#fff",
+              color: "#535353",
+              border: "1px solid #CCC",
+            }}
+            onClick={editProduct}
+          >
+            Edit
+          </Button>
+        }
       </div>
     </Card>
   );

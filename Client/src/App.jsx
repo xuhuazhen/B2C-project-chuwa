@@ -8,6 +8,10 @@ import LoginPage from "./pages/Login";
 import SignupPage from "./pages/Signup";
 import ChangePwdPage from "./pages/ChangePwd"
 import Products from "./pages/Products/ProductsList";
+import ErrorPage from "./pages/Error";
+import PublicRoute from "./router/PublicRoute";
+import AuthGuard from "./router/AuthGuard";
+import RoleGuard from "./router/RoleGuard";
 
 function Home() {
   return (
@@ -42,11 +46,48 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Products />} />
-        <Route path="/admin/create-product" element={<CreateProductPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/forget-pwd" element={<ChangePwdPage />} />
+        <Route path="/" 
+          element={
+          <AuthGuard allowGuest={true}>
+            <Products />
+          </AuthGuard>
+          } 
+        />
+        <Route 
+          path="/admin/create-product" 
+          element={
+            <AuthGuard>
+              <RoleGuard requiredRole="hr">
+                <CreateProductPage />
+              </RoleGuard>
+            </AuthGuard>
+          } 
+        />
+        <Route 
+          path="/login" 
+          element={
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          }
+        />
+        <Route 
+          path="/signup" 
+          element={
+            <PublicRoute>
+              <SignupPage />
+            </PublicRoute>
+          }
+        />
+        <Route 
+          path="/forget-pwd" 
+          element={
+          <PublicRoute>
+            <ChangePwdPage />
+          </PublicRoute>
+          } 
+        />
+        <Route path='*' element={<ErrorPage />} />
       </Routes>
     </BrowserRouter>
   );
