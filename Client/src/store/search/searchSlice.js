@@ -1,46 +1,43 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createThunk } from "../../utils/createThunks";
-import { getSearch } from "../../service/productService";
-
-export const fetchSearchResults = createThunk(
-  "search/fetchResults",
-  getSearch, //call search api
-  "products" //extract the products array from API response
-);
+import { fetchSearchThunk } from "./searchThunk";
 
 const searchSlice = createSlice({
   name: "search",
   initialState: {
-    results: [],
-    isFetching: false,
-    error: null,
     query: "",
+    results: [],
+    cache: {},
+    status: "idle",
+    error: null,
   },
   reducers: {
-    clearSearch: (state) => {
+    setQuery: (state, action) => {
+      state.query = action.payload;
+    },
+    clearSearchResults: (state) => {
       state.results = [];
       state.query = "";
-      state.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchSearchResults.pending, (state, action) => {
-        state.isFetching = true;
+      .addCase(fetchSearchThunk.pending, (state) => {
+        state.status = "loading";
         state.error = null;
-        state.query = action.meta.arg;
       })
-      .addCase(fetchSearchResults.fulfilled, (state, action) => {
-        state.isFetching = false;
+      .addCase(fetchSearchThunk.fulfilled, (state, action) => {
+        state.status = "succeeded";
         state.results = action.payload;
+        if (state.query) {
+          state.cache[state.query] = action.payload; // cache results
+        }
       })
-      .addCase(fetchSearchResults.rejected, (state, action) => {
-        state.isFetching = false;
-        state.error = action.payload;
-        state.results = [];
+      .addCase(fetchSearchThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
       });
   },
 });
 
-export const { clearSearch } = searchSlice.actions;
+export const { setQuery, clearSearchResults } = searchSlice.actions;
 export default searchSlice.reducer;

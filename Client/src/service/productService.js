@@ -13,8 +13,8 @@ export const getProductById = async (id) => {
 };
 
 //Get search product
-export const getSearch = async (query) => {
+export const getSearch = async (query, signal) => {
   if (!query) return [];
-  const res = await api.get(`/products/search?q=${query}`);
+  const res = await api.get(`/products/search?q=${query}`, { signal });
   return res.data;
 };
