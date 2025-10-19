@@ -15,6 +15,7 @@ export default function Products() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { products, loading, error } = useSelector((store) => store.products);
+  const userRole = useSelector((state) => state.user.curUser?.role);
 
   const [sort, setSort] = useState("Last Added");
   const [currentPage, setCurrentPage] = useState(1);
@@ -125,13 +126,15 @@ export default function Products() {
         </Title>
         <Flex wrap align="center" justify="space-between" gap={10}>
           <SortDropdown />
-          <Button
-            type="primary"
-            style={{ borderRadius: "4px", backgroundColor: "#5048E5" }}
-            onClick={() => navigate(`/admin/create-product`)}
-          >
-            Add Product
-          </Button>
+          { userRole === 'hr' &&
+            <Button
+              type="primary"
+              style={{ borderRadius: "4px", backgroundColor: "#5048E5" }}
+              onClick={() => navigate(`/admin/create-product`)}
+            >
+              Add Product
+            </Button>
+          }
         </Flex>
       </Flex>
 

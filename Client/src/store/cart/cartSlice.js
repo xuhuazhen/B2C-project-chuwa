@@ -28,7 +28,10 @@ const cartSlice = createSlice({
           existingItem
             ? (existingItem.quantity += 1)
             : state.items.push({product, quantity: 1 });
-        }
+        },
+        resetCart: (state) => {
+          Object.assign(state, initialState);
+        },
     // incrementItemQuantity: (state, action) => {
     //   const productId = action.payload;
     //   const existingItem = state.items.find((item) => item._id === productId);
@@ -87,6 +90,7 @@ export const {
   updateQuantity,
   removeItem,
   addToCart,
+  resetCart,
   // incrementItemQuantity,
   // decrementItemQuantity,
 } = cartSlice.actions; 

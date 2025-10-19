@@ -18,14 +18,15 @@ export const subTotalPrice = createSelector(cartsItem, (items) => {
 // calculate with tax
 export const totalTax = createSelector(subTotalPrice, (subtotal) => {
 
-  return subtotal > 0 ? (subtotal*0.092).toFixed(2) : '0';
+  return subtotal > 0 ? (subtotal*0.092).toFixed(2) : 0;
 });
 
 export const discountAmount = createSelector(subTotalPrice, discountRate, (subTotalPrice, discount) => {
-    return discount > 0 ? (subTotalPrice * discount).toFixed(2) : '0';
+    return discount > 0 ? (subTotalPrice * discount).toFixed(2) : 0;
 })
 
 // 含税总价
 export const totalPrice = createSelector(subTotalPrice, totalTax, discountAmount, (subtotal, tax, discount) => {
+  console.log(subtotal)
     return subtotal > 0 ? (parseFloat(subtotal) + parseFloat(tax) - parseFloat(discount)).toFixed(2) : 0;
 });
