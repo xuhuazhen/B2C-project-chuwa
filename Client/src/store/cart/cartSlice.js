@@ -1,125 +1,80 @@
-import { createSlice } from "@reduxjs/toolkit";
+// Client/src/store/cart/cartSlice.js
+import { createSlice } from '@reduxjs/toolkit';
+import { updateCartThunk, validatePromoCodeThunk } from './cartThunk';
 
 const initialState = {
-  items: [],
-  totalItems: 0,
-  totalPrice: 0,
+  items: [],               // [{ product: {...}, quantity }]
+  promoCode: null,
+  discountRate: 0,
+  loading: false,
+  error: null,
 };
 
 const cartSlice = createSlice({
-  name: "cart",
+  name: 'cart',
   initialState,
   reducers: {
+    // 直接覆盖 items（用在初始化/乐观更新/回滚）
     storeCartItems: (state, action) => {
       state.items = action.payload || [];
     },
+    // 调整某个商品数量
+    updateQuantity: (state, action) => {
+      const { productId, quantity } = action.payload;
+      const item = state.items.find((it) => it.product._id === productId);
+      if (item) item.quantity = quantity;
+    },
+    // 移除某个商品
+    removeItem: (state, action) => {
+      state.items = state.items.filter((it) => it.product._id !== action.payload);
+    },
+    // 可选：清空
     clearCart: (state) => {
       state.items = [];
-      state.totalItems = 0;
-      state.totalPrice = 0;
+      state.promoCode = null;
+      state.discountRate = 0;
+      state.loading = false;
+      state.error = null;
     },
-    addToCart: (state, action) => {
-      const product = action.payload;
-      const existingItem = state.items.find((item) => item._id === product._id);
-      existingItem
-        ? (existingItem.quantity += 1)
-        : state.items.push({ ...product, quantity: 1 });
+  },
+  extraReducers: (builder) => {
+    builder
+      // 更新购物车（与 updateCartThunk 对齐）
+      .addCase(updateCartThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateCartThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.items = action.payload || [];
+      })
+      .addCase(updateCartThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Failed to update cart';
+      })
 
-      state.totalItems += 1;
-      state.totalPrice += product.price;
-    },
-    incrementItemQuantity: (state, action) => {
-      const productId = action.payload;
-      const existingItem = state.items.find((item) => item._id === productId);
-      if (existingItem) {
-        existingItem.quantity += 1;
-        state.totalQuantity += 1;
-        state.totalPrice += existingItem.price;
-      }
-    },
-    decrementItemQuantity: (state, action) => {
-      const productId = action.payload;
-      const existingItem = state.items.find((item) => item._id === productId);
-      if (existingItem && existingItem.quantity > 0) {
-        existingItem.quantity -= 1;
-        state.totalQuantity -= 1;
-        state.totalPrice -= existingItem.price;
-
-        if (existingItem.quantity === 0) {
-          state.items = state.items.filter((item) => item._id !== productId);
-        }
-      }
-    },
+      // 校验优惠码
+      .addCase(validatePromoCodeThunk.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(validatePromoCodeThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.promoCode = action.payload.code;
+        state.discountRate = action.payload.discountRate;
+      })
+      .addCase(validatePromoCodeThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.promoCode = action.payload.code;
+        state.discountRate = action.payload.discountRate;
+      });
   },
 });
 
 export const {
   storeCartItems,
+  updateQuantity,
+  removeItem,
   clearCart,
-  addToCart,
-  incrementItemQuantity,
-  decrementItemQuantity,
 } = cartSlice.actions;
 
-export default cartSlice.reducer;
-import { createSlice } from '@reduxjs/toolkit';
-import { updateCartThunk, validatePromoCodeThunk } from './cartThunk';
-
-const initialState = {
-    items: [], 
-    promoCode: null,
-    discountRate: 0
-}; 
-
-const cartSlice = createSlice({
-    name: 'cart',
-    initialState,
-    reducers: {
-        storeCartItems: (state, action) => {
-            state.items = action.payload || []; 
-        },
-        updateQuantity: (state, action) => {
-            const { productId, quantity } = action.payload;
-            const item = state.items.find( item => item.product._id === productId);
-            if (item) item.quantity = quantity; 
-        },
-        removeItem: (state, action) => {
-            state.items = state.items.filter(item => item.product._id !== action.payload); //payload = productid
-        }, 
-     },
-    extraReducers: (builder) => {
-      builder
-        .addCase(updateCartThunk.pending, (state) => {
-            state.loading = true;
-            state.error = null;
-        })
-        .addCase(updateCartThunk.fulfilled, (state, action) => {
-            state.loading = false;
-            state.items = action.payload || []; 
-        })
-        .addCase(updateCartThunk.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.payload;
-        })
-        .addCase(validatePromoCodeThunk.pending, (state) => {
-            state.loading = true; 
-        })
-        .addCase(validatePromoCodeThunk.fulfilled, (state, action) => { 
-            state.loading = false; 
-            state.promoCode = action.payload.code;
-            state.discountRate = action.payload.discountRate; 
-        })
-        .addCase(validatePromoCodeThunk.rejected, (state, action) => {
-            state.loading = false; 
-            state.promoCode = action.payload.code;
-            state.discountRate = action.payload.discountRate; 
-        });
-    },
-});
-
-export const { 
-    storeCartItems, 
-    updateQuantity,
-    removeItem,
-} = cartSlice.actions; 
 export default cartSlice.reducer;

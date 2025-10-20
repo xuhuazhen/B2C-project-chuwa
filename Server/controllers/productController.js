@@ -1,5 +1,6 @@
 import { catchAsync } from "../utils/catchAsync.js";
 import { Product } from "../models/Product.js";
+import { AppError } from "../utils/appError.js"; 
 
 export const get_products = catchAsync(async (req, res, next) => {
   const products = await Product.find({ isActive: true }).sort({
@@ -42,4 +43,10 @@ export const get_search = catchAsync(async (req, res, next) => {
     results: products.length,
     products,
   });
+});
+export const get_productById = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const product = await Product.findById(id);
+  if (!product) return next(new AppError("Product not found", 404));
+  res.status(200).json({ status: "success", product });
 });

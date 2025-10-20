@@ -6,20 +6,17 @@ export const updateCartThunk = createAsyncThunk(
   'cart/updateCart',
   async ({ userId, prevCart }, { getState, dispatch, rejectWithValue }) => {
     try {
-      const curCart = getState().cart.items.map( item => ({
+      const curCart = getState().cart.items.map(item => ({
         product: item.product._id,
         quantity: item.quantity
       }));
 
-      const res = await api.patch(
-        `user/shopping-cart/${userId}`,
-        { cart: curCart },
-        { withCredentials: true }
-      );
+      // 与后端对齐：POST /api/user/shopping-cart/:id
+      const res = await api.post(`user/shopping-cart/${userId}`, { cart: curCart });
 
-      return res.data.data.cart;
+      return res.data.data.cart;  // 后端返回的数据结构
     } catch (err) {
-      // 回滚到 prev snapshot
+      // 回滚到快照
       dispatch(storeCartItems(prevCart));
       return rejectWithValue(err.response?.data?.message || err.message);
     }
@@ -28,11 +25,10 @@ export const updateCartThunk = createAsyncThunk(
 
 export const validatePromoCodeThunk = createAsyncThunk(
   'cart/validatePromoCode',
-  async(code, { rejectWithValue }) => {
+  async (code, { rejectWithValue }) => {
     try {
       const res = await api.post('user/validatePromoCode', { code });
-      console.log(res.data.data);
-      return res.data.data;   //code and discountRate
+      return res.data.data;   // { code, discountRate }
     } catch (err) {
       return rejectWithValue({
         code: null,
@@ -41,4 +37,4 @@ export const validatePromoCodeThunk = createAsyncThunk(
       });
     }
   }
-)
+);
