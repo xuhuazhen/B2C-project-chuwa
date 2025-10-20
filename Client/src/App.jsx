@@ -57,7 +57,7 @@ export default function App() {
           path="/admin/create-product" 
           element={
             <AuthGuard>
-              <RoleGuard requiredRole="hr">
+              <RoleGuard requiredRole="admin">
                 <CreateProductPage />
               </RoleGuard>
             </AuthGuard>
