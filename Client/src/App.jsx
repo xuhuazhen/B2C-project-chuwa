@@ -1,12 +1,12 @@
 import { Flex, Layout } from "antd";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import CreateProductPage from "./pages/createNewProduct";
-import AppHeader from "./components/header";
+import AppHeader from "./components/Header/header";
 import AppFooter from "./components/footer";
-const { Header, Footer, Sider, Content } = Layout;
+const { Content } = Layout;
 import LoginPage from "./pages/Login";
 import SignupPage from "./pages/Signup";
-import ChangePwdPage from "./pages/ChangePwd"
+import ChangePwdPage from "./pages/ChangePwd";
 import Products from "./pages/Products/ProductsList";
 import ErrorPage from "./pages/Error";
 import PublicRoute from "./router/PublicRoute";
@@ -19,7 +19,7 @@ function Home() {
       <Layout>
         <AppHeader />
         <Content>Content</Content>
-        <AppFooter></AppFooter>
+        <AppFooter />
       </Layout>
     </Flex>
   );
@@ -46,48 +46,49 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" 
+        <Route
+          path="/"
           element={
-          <AuthGuard allowGuest={true}>
-            <Products />
-          </AuthGuard>
-          } 
+            <AuthGuard allowGuest={true}>
+              <Products />
+            </AuthGuard>
+          }
         />
-        <Route 
-          path="/admin/create-product" 
+        <Route
+          path="/admin/create-product"
           element={
             <AuthGuard>
               <RoleGuard requiredRole="hr">
                 <CreateProductPage />
               </RoleGuard>
             </AuthGuard>
-          } 
+          }
         />
-        <Route 
-          path="/login" 
+        <Route
+          path="/login"
           element={
             <PublicRoute>
               <LoginPage />
             </PublicRoute>
           }
         />
-        <Route 
-          path="/signup" 
+        <Route
+          path="/signup"
           element={
             <PublicRoute>
               <SignupPage />
             </PublicRoute>
           }
         />
-        <Route 
-          path="/forget-pwd" 
+        <Route
+          path="/forget-pwd"
           element={
-          <PublicRoute>
-            <ChangePwdPage />
-          </PublicRoute>
-          } 
+            <PublicRoute>
+              <ChangePwdPage />
+            </PublicRoute>
+          }
         />
-        <Route path='*' element={<ErrorPage />} />
+        <Route path="*" element={<ErrorPage />} />
       </Routes>
     </BrowserRouter>
   );
