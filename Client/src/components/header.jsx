@@ -1,5 +1,5 @@
 import React from "react";
-import { Layout, Input, Avatar, Badge, Typography, Space, Flex } from "antd";
+import { Layout, Input, Avatar, Badge, Typography, Space, Flex, message } from "antd";
 import { UserOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import SearchProduct from "./SearchBar";
 import "./header.css";
@@ -36,12 +36,13 @@ const AppHeader = ({setOpen}) => {
         return navigate('/');
       }
     } catch(err) {
-        console.log(err);
+        if (err.response && err.response.data.message) message.error(err.response.data.message);
+        else message.error(err.message);
     }
   };
 
   return (
-    <Header style={{ backgroundColor: "#111827" }} className="header">
+    <Header style={{ backgroundColor: "#111827" }} className="header" id='app-header'>
       <div className="logo">
         <h4>
           Management

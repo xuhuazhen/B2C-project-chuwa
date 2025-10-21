@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.route('/login').post(post_login).get(get_login);
 router.route('/signup').post(post_signup);
-router.post('/forgot-password', validation, post_resetPwd);
+router.post('/forgot-password', post_resetPwd);
 router.route('/shopping-cart/:id').patch(validation, post_shoppingCart);
 router.get('/logout', get_logout);
 

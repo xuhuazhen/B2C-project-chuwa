@@ -77,9 +77,31 @@ const SignupPage =  () => {
                                 rules={[
                                     { required: true, message: 'Please enter your password!' }, 
                                     {
-                                        pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{6,}$/,
-                                        message: 'Invalid password input!'
-                                    }
+                                        validator: (_, value) => {
+                                            if (!value) return Promise.resolve();
+
+                                            if (value.length < 6) {
+                                                return Promise.reject(new Error('Password must be at least 6 characters long.'));
+                                            }
+                                            if (!/[0-9]/.test(value)) {
+                                                return Promise.reject(new Error('Password must include at least one number.'));
+                                            }
+
+                                            if (!/[A-Z]/.test(value)) {
+                                                return Promise.reject(new Error('Password must include at least one uppercase letter.'));
+                                            }
+
+                                            if (!/[a-z]/.test(value)) {
+                                                return Promise.reject(new Error('Password must include at least one lowercase letter.'));
+                                            }
+
+                                            if (!/[\W_]/.test(value)) {
+                                                return Promise.reject(new Error('Password must include at least one special character.'));
+                                            }
+
+                                            return Promise.resolve();
+                                        },
+                                    },
                                 ]}
                             >
                             <Input.Password placeholder="Enter your password" />
