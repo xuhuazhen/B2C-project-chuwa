@@ -115,7 +115,7 @@ const ProductCard = React.memo(({ product }) => {
             Add
           </Button>
         )}
-        {userRole === "hr" && (
+        { userRole === 'admin' &&
           <Button
             size="small"
             style={{
