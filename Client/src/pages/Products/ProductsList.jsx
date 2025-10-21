@@ -90,7 +90,7 @@ export default function ProductsList() {
         </Title>
         <Flex wrap align="center" justify="space-between" gap={10}>
           <SortDropdown />
-          { userRole === 'admin' &&
+          {userRole === "admin" && (
             <Button
               type="primary"
               style={{ borderRadius: "4px", backgroundColor: "#5048E5" }}

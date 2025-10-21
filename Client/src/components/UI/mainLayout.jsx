@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { Layout, Button } from "antd";
-import { ShoppingOutlined, ShoppingCartOutlined } from "@ant-design/icons";
-import AppHeader from "../header";
+import { Layout } from "antd";
+import AppHeader from "../Header/header";
 import AppFooter from "../footer";
 import CheckoutPage from "../../pages/Checkout/Checkout";
 
-const { Header, Content, Footer } = Layout;
+const { Content } = Layout;
 
 export default function MainLayout({ children }) {
   const [open, setOpen] = useState(false);
@@ -18,9 +17,6 @@ export default function MainLayout({ children }) {
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      {/* <Header style={{ color: "white", fontSize: 18 }}>
-        <ShoppingOutlined /> Product Management
-      </Header> */}
       <AppHeader setOpen={setOpen} />
       <Content style={{ padding: "50px", flex: 1, position: "relative" }}>
         {children}
