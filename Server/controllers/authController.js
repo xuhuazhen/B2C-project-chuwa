@@ -56,7 +56,7 @@ export const post_resetPwd = catchAsync(async (req, res, next) => {
 
     const resetToken = generateRestToken();
 
-    const resetURL = `http://localhost:5173/forgot-password"/${resetToken}`; //send email link
+    const resetURL = `http://localhost:5173/forgot-password/${resetToken}`; //send email link
     console.log(`Click here: ${resetURL}`);
 
     res.status(200).json({
