@@ -17,6 +17,8 @@ const searchSlice = createSlice({
     clearSearchResults: (state) => {
       state.results = [];
       state.query = "";
+      state.status = "idle";
+      state.error = null;
     },
   },
   extraReducers: (builder) => {

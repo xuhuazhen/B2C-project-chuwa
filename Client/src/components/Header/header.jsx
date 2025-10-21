@@ -46,7 +46,12 @@ const AppHeader = ({ setOpen }) => {
 
   return (
     <header style={{ backgroundColor: "#111827" }} className="header">
-      <div className="logo">
+      <div
+        className="logo"
+        onClick={() => {
+          navigate("/");
+        }}
+      >
         <h4>
           {isMobile ? "M" : "Management"}
           <span>Chuwa</span>
