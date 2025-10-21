@@ -12,6 +12,8 @@ import ErrorPage from "./pages/Error";
 import PublicRoute from "./router/PublicRoute";
 import AuthGuard from "./router/AuthGuard";
 import RoleGuard from "./router/RoleGuard";
+import { useEffect } from "react";
+import { initGlobalMessage } from "./utils/messageConfig";
 
 function Home() {
   return (
@@ -43,6 +45,10 @@ function Home() {
 // }
 
 export default function App() {
+  useEffect(() => {
+    initGlobalMessage();
+  },[]);
+
   return (
     <BrowserRouter>
       <Routes>

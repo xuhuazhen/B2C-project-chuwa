@@ -20,14 +20,12 @@ import api from '../api';
 
 const LoginPage = () => {
     const [loading, setLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
     const [form] = Form.useForm();
     
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const curCart = useSelector(state => state.cart.items);
-
-    
+  
     const handleSubmit = async (values) => { 
         setLoading(true);
 
@@ -48,14 +46,12 @@ const LoginPage = () => {
                 } else {
                     dispatch(storeCartItems(cart)); //后期可修改成merge cart
                 }
-                
+                message.success('Welcome back!');
                 navigate('/');
-            } else { 
-               message.error("Login failed. Please check your credentials and try again.");
-            }
+            }  
         } catch (err) {
-            if (err.response && err.response.data.message) setErrorMessage(err.response.data.message);
-            else setErrorMessage(err.message); 
+            if (err.response && err.response.data.message) message.error(err.response.data.message);
+            else message.error(err.message); 
         } finally {
             setLoading(false);
         }
@@ -74,18 +70,10 @@ const LoginPage = () => {
                     </div>
                 } 
                 >
-                {errorMessage && (
-                    <Alert
-                    message={errorMessage}
-                    type="error"
-                    showIcon
-                    style={{ marginBottom: 16 }}
-                    />
-                )}
+             
                     <Form form={form} 
                         layout='vertical'
                         onFinish={handleSubmit}
-                        onValuesChange={() => setErrorMessage('')}
                         autoComplete='off'
                     >
                         <Form.Item name="email"
