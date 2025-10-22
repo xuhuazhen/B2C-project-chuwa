@@ -3,6 +3,39 @@ import { AppError } from '../utils/appError.js';
 import { catchAsync } from '../utils/catchAsync.js';
 import { User } from '../models/User.js';
 import * as argon2 from 'argon2';
+import jwt from 'jsonwebtoken';
+
+export const get_login = catchAsync(async (req, res, next) => {
+    res.set('Cache-Control', 'no-store');
+    console.log('logincheck', req.cookies.token);
+    if (req.cookies.token) {
+        
+    console.log('chekcing');
+        try {
+            const decoded = jwt.verify(
+                req.cookies.token,
+                process.env.ACCESS_TOKEN_SECRET
+            );
+
+            const currentUser = await User.findById(decoded.id).populate('cart.product');
+            console.log(currentUser);
+
+            if (!currentUser) {
+                return res.status(200).json({ isLogin: false });
+            }
+        
+            currentUser.password = undefined;
+            res.status(200).json({
+                status: 'success',
+                data: { currentUser },
+            });
+        } catch (err) {
+        return res.status(200).json({ status: 'fail' });
+        }
+    } else {
+        return res.status(200).json({ status: 'fail' });
+    }
+});
 
 export const get_logout = catchAsync(async (req, res, next) => {
   res.cookie('token', 'loggedout', {

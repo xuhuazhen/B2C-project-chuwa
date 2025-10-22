@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { updateCartThunk, validatePromoCodeThunk } from './cartThunk';
 
 const initialState = {
-  items: [],               // [{ product: {...}, quantity }]
+  items: [],               // 形如 [{ product: {...}, quantity }]
   promoCode: null,
   discountRate: 0,
   loading: false,
@@ -14,21 +14,36 @@ const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
-    // 直接覆盖 items（用在初始化/乐观更新/回滚）
+    // 覆盖 items（初始化/回滚/服务端同步）
     storeCartItems: (state, action) => {
       state.items = action.payload || [];
     },
-    // 调整某个商品数量
+
+    // ✅ 新增：添加到购物车（若已存在则累加数量）
+    addToCart: (state, action) => {
+      const { product, quantity = 1 } = action.payload || {};
+      if (!product || !product._id) return;
+      const existing = state.items.find((it) => it.product._id === product._id);
+      if (existing) {
+        existing.quantity += quantity;
+      } else {
+        state.items.push({ product, quantity });
+      }
+    },
+
+    // 调整某个商品数量（直接设定）
     updateQuantity: (state, action) => {
       const { productId, quantity } = action.payload;
       const item = state.items.find((it) => it.product._id === productId);
       if (item) item.quantity = quantity;
     },
+
     // 移除某个商品
     removeItem: (state, action) => {
       state.items = state.items.filter((it) => it.product._id !== action.payload);
     },
-    // 可选：清空
+
+    // 清空
     clearCart: (state) => {
       state.items = [];
       state.promoCode = null;
@@ -36,10 +51,14 @@ const cartSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
+
+    // 供 header.jsx 使用：重置为初始状态
+    resetCart: () => ({ ...initialState }),
   },
+
   extraReducers: (builder) => {
     builder
-      // 更新购物车（与 updateCartThunk 对齐）
+      // 与后端同步购物车
       .addCase(updateCartThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -72,9 +91,11 @@ const cartSlice = createSlice({
 
 export const {
   storeCartItems,
+  addToCart,        // ← 新增导出
   updateQuantity,
   removeItem,
   clearCart,
+  resetCart,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

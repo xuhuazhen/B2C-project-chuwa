@@ -15,7 +15,7 @@ export default function Products() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { products, loading, error } = useSelector((store) => store.products);
-
+  const userRole = useSelector((state) => state.user.curUser?.role);
   const [sort, setSort] = useState("Last Added");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -60,6 +60,7 @@ export default function Products() {
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   const currentProducts = sortedProducts.slice(startIndex, endIndex);
+  console.log("currentProducts:", currentProducts);
 
   const handleSortChange = ({ key }) => {
     if (key === "1") setSort("Price: low to high");
@@ -124,20 +125,22 @@ export default function Products() {
         </Title>
         <Flex wrap align="center" justify="space-between" gap={10}>
           <SortDropdown />
-          <Button
-            type="primary"
-            style={{ borderRadius: "4px", backgroundColor: "#5048E5" }}
-            onClick={() => navigate(`/admin/create-product`)}
-          >
-            Add Product
-          </Button>
+          { userRole === 'admin' &&
+            <Button
+              type="primary"
+              style={{ borderRadius: "4px", backgroundColor: "#5048E5" }}
+              onClick={() => navigate(`/admin/create-product`)}
+            >
+              Add Product
+            </Button>
+          }
         </Flex>
       </Flex>
 
       <div className="product-grid">
         {currentProducts.map((product) => (
-          <div className="product-item">
-            <ProductCard key={product._id} product={product} />
+          <div className="product-item" key={product._id}>
+            <ProductCard product={product} />
           </div>
         ))}
       </div>

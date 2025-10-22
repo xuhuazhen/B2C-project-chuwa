@@ -12,13 +12,11 @@ import {
 } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import 'antd/dist/reset.css';
-
-import store from "../store/store";
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { storeUser } from '../store/user/userSlice';
 import { storeCartItems } from '../store/cart/cartSlice';
-import api from '../api';
 import { updateCartThunk } from '../store/cart/cartThunk';
+import api from '../api';
 
 const LoginPage = () => {
     const [loading, setLoading] = useState(false);
@@ -27,7 +25,8 @@ const LoginPage = () => {
     
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const curCart = store.getState().cart.items;
+    const curCart = useSelector(state => state.cart.items);
+
     
     const handleSubmit = async (values) => { 
         setLoading(true);
@@ -44,7 +43,7 @@ const LoginPage = () => {
                 dispatch(storeUser(userInfo));
 
                 // 如果未登录前添加购物车
-                if ( curCart.length !== 0 && cart.length == 0 ) {
+                if ( curCart.length !== 0 && cart.length === 0 ) {
                     dispatch(updateCartThunk(curCart));
                 } else {
                     dispatch(storeCartItems(cart)); //后期可修改成merge cart

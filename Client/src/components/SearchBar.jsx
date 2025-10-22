@@ -1,52 +1,67 @@
-import { useState, useEffect } from "react";
 import { AutoComplete, Input, Spin } from "antd";
+import { useState, useMemo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { fetchSearchResults, clearSearch } from "../store/search/searchSlice";
+import debounce from "lodash.debounce";
+import { setQuery, clearSearchResults } from "../store/search/searchSlice";
+import { fetchSearchThunk } from "../store/search/searchThunk";
 
 const SearchProduct = () => {
   const [searchInput, setSearchInput] = useState("");
-  const [debouncedValue, setDebouncedValue] = useState("");
   const dispatch = useDispatch();
+  const { results, status } = useSelector((store) => store.search);
   const navigate = useNavigate();
 
-  const { results: products, isFetching } = useSelector(
-    (state) => state.search
+  const debouncedSearch = useMemo(
+    () =>
+      debounce(async (value) => {
+        const input = value.trim();
+        dispatch(setQuery(input));
+
+        if (input.length <= 1) {
+          dispatch(clearSearchResults());
+          return;
+        }
+
+        await dispatch(fetchSearchThunk(input));
+      }, 300),
+    [dispatch]
   );
 
-  // Debounce user input
+  //Cleanup debounce on unmount
   useEffect(() => {
-    const handler = setTimeout(() => setDebouncedValue(searchInput), 300);
-    return () => clearTimeout(handler);
-  }, [searchInput]);
+    return () => debouncedSearch.cancel();
+  }, [debouncedSearch]);
 
-  // Fetch search results
-  useEffect(() => {
-    if (!debouncedValue.trim()) {
-      dispatch(clearSearch()); //clear previous search results from the Redux store
-      return;
-    }
-    dispatch(fetchSearchResults(debouncedValue));
-  }, [debouncedValue, dispatch]);
+  const searchHandler = (value) => {
+    setSearchInput(value);
+    debouncedSearch(value);
+  };
 
-  const options = (products || []).map((product) => ({
+  const selectHandler = (value) => {
+    if (value) navigate(`/products/${value}`);
+  };
+
+  const options = results.map((product) => ({
     value: product._id,
     label: product.name,
   }));
 
-  // console.log(`options ${options}`);
+  console.log(options);
 
   return (
     <AutoComplete
       style={{ width: 300 }}
       options={options}
-      onSearch={(value) => setSearchInput(value)}
-      notFoundContent={isFetching ? <Spin size="small" /> : "No results"}
+      onSearch={searchHandler}
+      notFoundContent={
+        status === "loading" ? <Spin size="small" /> : "No results"
+      }
       placeholder="Search products"
       allowClear
-      onSelect={(value) => navigate(`/products/${value}`)}
+      onSelect={selectHandler}
     >
-      <Input.Search size="large" enterButton />
+      <Input.Search size="large" enterButton onSearch={selectHandler} />
     </AutoComplete>
   );
 };

@@ -1,17 +1,15 @@
 import React from "react";
 import { Card } from "antd";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
-import { useSelector, useDispatch } from "react-redux";
-import {
-  addToCart,
-  decrementItemQuantity,
-  incrementItemQuantity,
-} from "../store/cart/cartSlice";
+import { useSelector } from "react-redux"; 
 import { makeSelectCartItemById } from "../store/cart/selectors";
 import Button from "../components/Button";
+import  { useDebouncedCartSync }  from '../hooks/useDebouncedCartSync' 
 
 const ProductCard = React.memo(({ product }) => {
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
+  const userRole = useSelector(state => state.user.curUser?.role);
+  const { handleAdd, handleQuantity } = useDebouncedCartSync();
 
   //Create a memoized selector for this product
   const selectCartItem = React.useMemo(
@@ -22,18 +20,23 @@ const ProductCard = React.memo(({ product }) => {
   //Subscribe to only this cart item
   const cartItem = useSelector(selectCartItem);
 
-  const addToCartHandler = () => {
-    dispatch(addToCart(product));
-    console.log(product);
-  };
+  // const addToCartHandler = () => {
+  //   dispatch(addToCart(product));
+  //   console.log(product);
+  // };
 
-  const incrementHandler = () => {
-    dispatch(incrementItemQuantity(product._id));
-    console.log(product._id);
-  };
-  const decrementHandler = () => {
-    dispatch(decrementItemQuantity(product._id));
-  };
+  // const incrementHandler = () => {
+  //   dispatch(incrementItemQuantity(product._id));
+  //   console.log(product._id);
+  // };
+  // const decrementHandler = () => {
+  //   dispatch(decrementItemQuantity(product._id));
+  // };
+
+  const editProduct = () => {
+    console.log('navigate to product detail');
+  }
+
   return (
     <Card
       style={{ border: "1px solid #CCC", borderRadius: "4px", width: "100%" }}
@@ -98,31 +101,33 @@ const ProductCard = React.memo(({ product }) => {
       >
         {cartItem ? (
           <Button size="small" style={{ width: "110px" }}>
-            <MinusOutlined onClick={decrementHandler} />
+            <MinusOutlined onClick={() => handleQuantity(product._id, cartItem.quantity - 1)} />
             <span>{cartItem?.quantity || 0}</span>
-            <PlusOutlined onClick={incrementHandler} />
+            <PlusOutlined onClick={() => handleQuantity(product._id, cartItem.quantity + 1)} />
           </Button>
         ) : (
           <Button
             size="small"
-            onClick={addToCartHandler}
+            onClick={() => handleAdd(product)}
             style={{ width: "110px" }}
           >
             Add
           </Button>
         )}
-        <Button
-          size="small"
-          style={{
-            width: "110px",
-            backgroundColor: "#fff",
-            color: "#535353",
-            border: "1px solid #CCC",
-          }}
-          onClick={addToCartHandler}
-        >
-          Edit
-        </Button>
+        { userRole === 'admin' &&
+          <Button
+            size="small"
+            style={{
+              width: "110px",
+              backgroundColor: "#fff",
+              color: "#535353",
+              border: "1px solid #CCC",
+            }}
+            onClick={editProduct}
+          >
+            Edit
+          </Button>
+        }
       </div>
     </Card>
   );
