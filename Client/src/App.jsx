@@ -1,46 +1,16 @@
-import { Flex, Layout } from "antd";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import CreateProductPage from "./pages/createNewProduct";
-import AppHeader from "./components/header";
-import AppFooter from "./components/footer";
-const { Header, Footer, Sider, Content } = Layout;
-import LoginPage from "./pages/Login";
-import SignupPage from "./pages/Signup";
-import ChangePwdPage from "./pages/ChangePwd"
+// Client/src/App.jsx
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"; 
+// import Products from "/src/pages/Products/Products.jsx";
 import Products from "./pages/Products/ProductsList";
+import ProductDetail from "/src/pages/ProductDetail.jsx"; // ← 这里没有 /Products 目录
+import CreateProductPage from './pages/createNewProduct';
+import LoginPage from './pages/Login';
+import SignupPage from "./pages/Signup";
+import ChangePwdPage from "./pages/ChangePwd";
 import ErrorPage from "./pages/Error";
-import PublicRoute from "./router/PublicRoute";
-import AuthGuard from "./router/AuthGuard";
-import RoleGuard from "./router/RoleGuard";
-
-function Home() {
-  return (
-    <Flex gap="middle" wrap>
-      <Layout>
-        <AppHeader />
-        <Content>Content</Content>
-        <AppFooter></AppFooter>
-      </Layout>
-    </Flex>
-  );
-}
-// function Home() {
-//   return (
-//     <div style={{ padding: 24 }}>
-//       <h1>Home Page</h1>
-//       <p><Link to="/admin/create-product">Go to Create Product Page</Link></p>
-//       <p><Link to="/login">Go to login Page</Link></p>
-//     </div>
-//   );
-//   // return (
-//   //   <div style={{ padding: 24 }}>
-//   //     <h1>Home Page</h1>
-//   //     <p>
-//   //       <Link to="/admin/create-product">Go to Create Product Page</Link>
-//   //     </p>
-//   //   </div>
-//   // );
-// }
+import AuthGuard from './router/AuthGuard';
+import RoleGuard from './router/RoleGuard';
+import PublicRoute from './router/PublicRoute';
 
 export default function App() {
 
@@ -51,6 +21,12 @@ export default function App() {
           element={
           <AuthGuard allowGuest={true}>
             <Products />
+          </AuthGuard>
+          } 
+        />
+        <Route path="/products/:id" element={
+          <AuthGuard allowGuest={true}>
+            <ProductDetail />
           </AuthGuard>
           } 
         />

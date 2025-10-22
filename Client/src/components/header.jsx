@@ -38,6 +38,7 @@ const AppHeader = ({setOpen}) => {
       if (res.data.status  === 'success') {
         dispatch(logout());
         dispatch(resetCart());
+        message.success('Logout succeessful');
         return navigate('/', { replace: true });
       }
     } catch(err) {
