@@ -12,7 +12,7 @@ export const fetchSearchThunk = createAsyncThunk(
     try {
       const data = await getSearch(query, signal);
 
-      console.log("API response:", data);
+      // console.log("API response:", data);
 
       return data.products;
     } catch (err) {

@@ -10,7 +10,7 @@ const productsSlice = createSlice({
     limit: 10,
     loading: false,
     error: null,
-    sort: "latest",
+    sort: "-createdAt",
   },
   reducers: {
     setCurrentPage: (state, action) => {

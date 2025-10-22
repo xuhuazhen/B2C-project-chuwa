@@ -26,28 +26,11 @@ function Home() {
     </Flex>
   );
 }
-// function Home() {
-//   return (
-//     <div style={{ padding: 24 }}>
-//       <h1>Home Page</h1>
-//       <p><Link to="/admin/create-product">Go to Create Product Page</Link></p>
-//       <p><Link to="/login">Go to login Page</Link></p>
-//     </div>
-//   );
-//   // return (
-//   //   <div style={{ padding: 24 }}>
-//   //     <h1>Home Page</h1>
-//   //     <p>
-//   //       <Link to="/admin/create-product">Go to Create Product Page</Link>
-//   //     </p>
-//   //   </div>
-//   // );
-// }
 
 export default function App() {
   useEffect(() => {
     initGlobalMessage();
-  },[]);
+  }, []);
 
   return (
     <BrowserRouter>

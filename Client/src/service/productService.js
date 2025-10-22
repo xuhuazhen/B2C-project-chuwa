@@ -19,12 +19,7 @@ export const getProductById = async (id) => {
   return res.data;
 };
 
-// Get search product
-// export const getSearch = async (query, signal) => {
-//   if (!query) return [];
-//   const res = await api.get(`/products/search?q=${query}`, { signal });
-//   return res.data;
-// };
+//Get search query
 export const getSearch = async (query, signal) => {
   if (!query) return { products: [] };
 

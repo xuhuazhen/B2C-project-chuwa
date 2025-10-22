@@ -11,63 +11,93 @@ import "./SearchBar.css";
 const SearchProduct = () => {
   const [searchInput, setSearchInput] = useState("");
   const [open, setOpen] = useState(false);
+
   const dispatch = useDispatch();
-  const { results, status } = useSelector((store) => store.search);
-  const containerRef = useRef(null);
   const navigate = useNavigate();
+  const containerRef = useRef(null);
+  const { results, status } = useSelector((store) => store.search);
 
   // Debounced search
   const debouncedSearch = useMemo(
     () =>
       debounce(async (value) => {
-        const input = value.trim();
-        dispatch(setQuery(input));
+        const query = value.trim();
+        dispatch(setQuery(query));
 
-        if (input.length <= 1) {
+        if (query.length <= 1) {
           dispatch(clearSearchResults());
           return;
         }
 
-        await dispatch(fetchSearchThunk(input));
+        await dispatch(fetchSearchThunk(query));
       }, 300),
     [dispatch]
   );
 
-  //Prevents pending debounced calls when the component unmounts
-  useEffect(() => {
-    return () => debouncedSearch.cancel();
-  }, [debouncedSearch]);
+  // Cleanup debounce on unmount
+  useEffect(() => () => debouncedSearch.cancel(), [debouncedSearch]);
 
-  //Open dropdown if results exist
-  useEffect(() => {
-    if (results.length > 0) setOpen(true);
-  }, [results]);
-
-  //Close dropdown when clickin outide the results box
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (containerRef.current && !containerRef.current.contains(e.target)) {
-        setOpen(false);
-      }
+      if (!containerRef.current?.contains(e.target)) setOpen(false);
     };
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  //Update local state input
+  // Handle input changes
   const searchHandler = (value) => {
     setSearchInput(value);
+
     if (value.trim().length === 0) {
       dispatch(clearSearchResults());
       setOpen(false);
+      return;
     }
     debouncedSearch(value);
   };
 
-  //Navigate to specific product when select
+  // Open dropdown only when results are ready
+  useEffect(() => {
+    const hasQuery = searchInput.trim().length > 0;
+
+    if (hasQuery && (status === "succeeded" || status === "failed")) {
+      setOpen(true);
+      return;
+    }
+
+    // Close when cleared or idle
+    if (!hasQuery || status === "idle") {
+      setOpen(false);
+    }
+  }, [status, searchInput]);
+
+  // Handle product click
   const selectHandler = (id) => {
     navigate(`/products/${id}`);
     setOpen(false);
+  };
+
+  // Render dropdown content
+  const renderDropdown = () => {
+    if (results.length > 0) {
+      return results.map((item) => (
+        <div
+          key={item._id}
+          onClick={() => selectHandler(item._id)}
+          className="search-dropdown-item"
+        >
+          {item.name}
+        </div>
+      ));
+    }
+
+    if (searchInput.trim().length > 0 && status === "succeeded") {
+      return <div className="search-dropdown-item">No results found</div>;
+    }
+
+    return null;
   };
 
   return (
@@ -86,28 +116,12 @@ const SearchProduct = () => {
           )
         }
         onFocus={() => {
-          if (results.length > 0) setOpen(true);
+          if (searchInput.trim() && results.length > 0) setOpen(true);
         }}
         className="search-input"
       />
 
-      {open && (
-        <div className="search-dropdown" role="status" aria-live="polite">
-          {results.length > 0 ? (
-            results.map((item) => (
-              <div
-                key={item._id}
-                onClick={() => selectHandler(item._id)}
-                className="search-dropdown-item"
-              >
-                {item.name}
-              </div>
-            ))
-          ) : (
-            <div className="search-dropdown-item">No results found</div>
-          )}
-        </div>
-      )}
+      {open && <div className="search-dropdown">{renderDropdown()}</div>}
     </div>
   );
 };

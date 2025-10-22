@@ -56,7 +56,7 @@ export default function ProductsList() {
       label: "Price: high to low",
       onClick: sortChangeHandler,
     },
-    { key: "latest", label: "Last Added", onClick: sortChangeHandler },
+    { key: "-createdAt", label: "Last Added", onClick: sortChangeHandler },
   ];
 
   const SortDropdown = () => (
@@ -67,8 +67,19 @@ export default function ProductsList() {
         selectedKeys: [sort],
       }}
     >
-      <Button className="sort-button">
-        <Space>
+      <Button
+        style={{
+          color: "#565656",
+          backgroundColor: "#fff",
+          border: "1px solid #D9D9D9",
+          borderRadius: "4px",
+          width: "179px",
+          height: "40px",
+          fontSize: "14px",
+          fontWeight: 600,
+        }}
+      >
+        <Space style={{ borderRadius: "4px" }}>
           {items.find((i) => i.key === sort)?.label}
           <DownOutlined />
         </Space>
@@ -78,22 +89,22 @@ export default function ProductsList() {
 
   return (
     <MainLayout>
-      <Flex
-        wrap
-        align="center"
-        justify="space-between"
-        gap={20}
-        style={{ marginBottom: "24px" }}
-      >
+      <Flex className="product-list--header">
         <Title style={{ fontSize: "32px", fontWeight: 700, margin: 0 }}>
           Products
         </Title>
-        <Flex wrap align="center" justify="space-between" gap={10}>
+        <Flex className="product-list--cta">
           <SortDropdown />
           {userRole === "admin" && (
             <Button
+              className="add-product--button"
               type="primary"
-              style={{ borderRadius: "4px", backgroundColor: "#5048E5" }}
+              style={{
+                width: "133px",
+                height: "40px",
+                fontSize: "14px",
+                fontWeight: 600,
+              }}
               onClick={() => navigate(`/admin/create-product`)}
             >
               Add Product
