@@ -136,7 +136,8 @@ const CheckoutPage = ({open, onClose}) => {
                     <p>Estimated total</p>
                     <p>${parseFloat(total).toFixed(2)}</p>
                 </div>
-                <Button size='large'> Continue to checkout </Button>
+                <Button size='large' onClick={()=> console.log(`Your total is ${total}`)}
+                > Continue to checkout </Button>
             </div>
          </div>
     </Drawer>

@@ -1,29 +1,17 @@
-import { useState } from 'react'; 
-import { useNavigate } from 'react-router-dom'; 
-import './style.css';
+import { useState } from 'react';  
 import MainLayout from '../components/UI/mainLayout';
-import {
-    Form,
-    Input,
-    Button,
-    Card, 
-    Alert
-} from 'antd';
-import { CloseOutlined, MailTwoTone } from '@ant-design/icons';
+import { Card, Button, message } from 'antd';
 import api from '../api';
+import { AuthForm } from '../components/AuthForm/authForm'; 
+import '../components/AuthForm/style.css';
 
 const ChangePwdPage = () => {
     const [loading, setLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState(''); 
-    const [form] = Form.useForm();
-    const [isSent, setIsSent] = useState(false);
-
-    const navigate = useNavigate();
+    const [isSent, setIsSent] = useState(false);  
 
     const handleSubmit = async (values) => {
         console.log(values)
         setLoading(true);
-        setErrorMessage('');
 
         try {
             const res = await api.post( "user/forgot-password",
@@ -32,14 +20,12 @@ const ChangePwdPage = () => {
             )
             if (res.data.status === 'success') {
                 setIsSent(true);
-            } else {
-                setErrorMessage(res.data.message || "Something went wrong, please try again.");
-            }
+            }  
         } catch (err) {
             if (err.response && err.response.data.message) {
-                setErrorMessage(err.response.data.message);
+                message.error(err.response.data.message);
             } else {
-                setErrorMessage("Unable to send reset link. Please try again later.");
+                message.error("Unable to send reset link. Please try again later.");
             }
         } finally {
             setLoading(false);
@@ -49,7 +35,30 @@ const ChangePwdPage = () => {
 
     return (
         <MainLayout>
-            <div className="authPage">
+            {!isSent ? (
+                <AuthForm
+                title="Update your password"
+                subtitle="Enter your email, we will send you a recovery link"
+                fields={[
+                    {
+                    name: 'email',
+                    label: 'Email',
+                    placeholder: 'Enter your email',
+                    rules: [
+                        { required: true, message: 'Please enter your email!' },
+                        { type: 'email', message: 'Invalid email format!' },
+                    ],
+                    },
+                ]}
+                buttonText="Send Reset Link"
+                loading={loading}
+                onSubmit={handleSubmit}
+                />
+            ) : (
+                <AuthForm footer='sentEmail'></AuthForm>
+            )}
+
+            {/* <div className="authPage">
                 { !isSent && <Card title={
                     <div className='card-header'>
                         <Button type="text"
@@ -112,7 +121,7 @@ const ChangePwdPage = () => {
                     </div>
                 </Card>
                 }
-            </div>
+            </div> */}
         </MainLayout>
         
   );

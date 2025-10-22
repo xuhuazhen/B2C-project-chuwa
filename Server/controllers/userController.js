@@ -36,6 +36,7 @@ export const post_validateCode = catchAsync(async (req, res, next) => {
 export const post_shoppingCart = catchAsync(async (req, res, next) => {
     const id = req.params.id;
     const { cart } = req.body;
+    console.log("post shopping cart",id,cart)
     const user = await User.findByIdAndUpdate(
         id,
         { cart },

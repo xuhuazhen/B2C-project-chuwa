@@ -1,30 +1,15 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
-import './style.css';
+import { useNavigate } from 'react-router-dom';  
 import MainLayout from '../components/UI/mainLayout';
-import {
-  Form,
-  Input,
-  Button,
-  Card,
-  message,
-  Alert
-} from 'antd';
-import { CloseOutlined } from '@ant-design/icons';
-import 'antd/dist/reset.css';
-import { useSelector, useDispatch } from 'react-redux';
-import { storeUser } from '../store/user/userSlice';
-import { storeCartItems } from '../store/cart/cartSlice';
-import { updateCartThunk } from '../store/cart/cartThunk';
+import { message } from 'antd'; 
+import 'antd/dist/reset.css'; 
 import api from '../api';
+import { AuthForm } from '../components/AuthForm/authForm';
 
 const LoginPage = () => {
-    const [loading, setLoading] = useState(false);
-    const [form] = Form.useForm();
+    const [loading, setLoading] = useState(false); 
     
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
-    const curCart = useSelector(state => state.cart.items);
+    const navigate = useNavigate(); 
   
     const handleSubmit = async (values) => { 
         setLoading(true);
@@ -37,17 +22,17 @@ const LoginPage = () => {
             );     
 
             if (res.data.status === "success") {
-                const { cart, ...userInfo } = res.data.data.user;
-                dispatch(storeUser(userInfo));
+                // const { cart, ...userInfo } = res.data.data.user;
+                // dispatch(storeUser(userInfo));
 
-                // 如果未登录前添加购物车
-                if ( curCart.length !== 0 && cart.length === 0 ) {
-                    dispatch(updateCartThunk(curCart));
-                } else {
-                    dispatch(storeCartItems(cart)); //后期可修改成merge cart
-                }
+                // // 如果未登录前添加购物车
+                // if ( curCart.length !== 0 && cart.length === 0 ) {
+                //     dispatch(updateCartThunk(curCart));
+                // } else {
+                //     dispatch(storeCartItems(cart)); //后期可修改成merge cart
+                // }
                 message.success('Welcome back!');
-                navigate('/');
+                navigate('/', { replace: true });
             }  
         } catch (err) {
             if (err.response && err.response.data.message) message.error(err.response.data.message);
@@ -59,62 +44,33 @@ const LoginPage = () => {
   
     return (
         <MainLayout>
-            <div className="authPage">
-                <Card title={
-                    <div className='card-header'>
-                        <Button type="text"
-                            icon={<CloseOutlined />}
-                            onClick={() => navigate('/')}
-                        />        
-                        <span>Sign in to your account</span>
-                    </div>
-                } 
-                >
-             
-                    <Form form={form} 
-                        layout='vertical'
-                        onFinish={handleSubmit}
-                        autoComplete='off'
-                    >
-                        <Form.Item name="email"
-                            label="Email"
-                            rules={[
-                                { required: true, message: 'Please enter your email!' },
-                                { type: 'email', message: 'Invalid email format!' },
-                            ]}
-                        >
-                            <Input placeholder="Enter your email" />
-                        </Form.Item>
-                        <Form.Item name="password"
-                            label="Password"
-                            rules={[
-                                { required: true, message: 'Please enter your password!' }, 
-                            ]}
-                        >
-                        <Input.Password placeholder="Enter your password" />
-                        </Form.Item>
-                        <Form.Item>
-                            <Button
-                                type="primary"
-                                htmlType="submit"
-                                loading={loading}
-                                block
-                            >
-                                Log In
-                            </Button>
-                        </Form.Item>
-                    </Form>
-                    <div className='login-footer'>
-                        <span style={{marginRight: 10}}>
-                            Don't have an account?{' '}
-                            <a onClick={() => navigate('/signup')}>Sign Up</a>
-                        </span>
-                        <span>
-                            <a onClick={() => navigate('/forget-pwd')}>Forget password?</a>
-                        </span>
-                    </div>
-                </Card>
-            </div>
+            <AuthForm 
+                title='Sign in to your accoun' 
+                fields={[
+                {
+                    name: 'email',
+                    label: 'Email',
+                    placeholder: 'Enter your email',
+                    rules: [
+                    { required: true, message: 'Please enter your email!' },
+                    { type: 'email', message: 'Invalid email format!' },
+                    ],
+                },
+                {
+                    name: 'password',
+                    label: 'Password',
+                    type: 'password',
+                    placeholder: 'Enter your password',
+                    rules: [{ required: true, message: 'Please enter your password!' }],
+                },
+                ]}
+                buttonText='Log In'
+                loading={loading} 
+                onSubmit={handleSubmit}
+                footer='logIn'
+            > 
+
+            </AuthForm>
         </MainLayout>
         
   );

@@ -57,28 +57,25 @@ const cartSlice = createSlice({
     },
     extraReducers: (builder) => {
       builder
-        .addCase(updateCartThunk.pending, (state) => {
-            state.loading = true;
-            state.error = null;
-        })
-        .addCase(updateCartThunk.fulfilled, (state, action) => {
-            state.loading = false;
+        // .addCase(updateCartThunk.pending, (state) => {
+        //     state.loading = true;
+        //     state.error = null;
+        // })
+        .addCase(updateCartThunk.fulfilled, (state, action) => { 
             state.items = action.payload || []; 
         })
-        .addCase(updateCartThunk.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.payload;
-        })
-        .addCase(validatePromoCodeThunk.pending, (state) => {
-            state.loading = true; 
-        })
-        .addCase(validatePromoCodeThunk.fulfilled, (state, action) => { 
-            state.loading = false; 
+        // .addCase(updateCartThunk.rejected, (state, action) => {
+        //     state.loading = false;
+        //     state.error = action.payload;
+        // })
+        // .addCase(validatePromoCodeThunk.pending, (state) => {
+        //     state.loading = true; 
+        // })
+        .addCase(validatePromoCodeThunk.fulfilled, (state, action) => {  
             state.promoCode = action.payload.code;
             state.discountRate = action.payload.discountRate; 
         })
-        .addCase(validatePromoCodeThunk.rejected, (state, action) => {
-            state.loading = false; 
+        .addCase(validatePromoCodeThunk.rejected, (state, action) => { 
             state.promoCode = action.payload.code;
             state.discountRate = action.payload.discountRate; 
         });
