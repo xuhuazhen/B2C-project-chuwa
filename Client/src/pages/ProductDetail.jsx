@@ -22,7 +22,7 @@ export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   // const dispatch = useDispatch();
-  const handleAdd = useDebouncedCartSync();
+    const { handleAdd, handleQuantity } = useDebouncedCartSync();
 
   // 兼容不同 slice 命名（任选存在的）
   const user =
