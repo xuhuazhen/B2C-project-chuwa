@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom'; 
 import { logout, fetchUserSession } from '../store/user/userSlice';
 import { resetCart } from '../store/cart/cartSlice'; 
@@ -8,8 +8,8 @@ import LoadingSpin from '../components/UI/LoadingSpin';
 export const AuthGuard = ({ children, allowGuest = false }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
-
+  const location = useLocation(); 
+  const userStatus = useSelector((state) => state.user.curUser);
   const [isChecking, setIsChecking] = useState(true);
 
   // clear store function
@@ -24,23 +24,21 @@ export const AuthGuard = ({ children, allowGuest = false }) => {
 
   // memoize the function so it won't be recreated on every render
   const checkLoginStatus = useCallback(async()=> {
-    setIsChecking(true);
-
+    setIsChecking(true); 
     try {    
       await dispatch(fetchUserSession()).unwrap();
     } catch {
-      clearStore();
+      if (userStatus) clearStore();
     } finally {
       setIsChecking(false);
     }
   }, [
-    dispatch, 
-    clearStore
+    dispatch
   ]);
 
   // useEffect only triggers the login check logic when AuthGuard is used 
   // and the checkLoginStatus function is (re)created due to dependency changes
-  useEffect(() => {
+  useEffect(() => {  
     checkLoginStatus();
   }, [checkLoginStatus]);
 

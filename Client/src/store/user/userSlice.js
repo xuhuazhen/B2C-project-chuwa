@@ -9,7 +9,7 @@ export const fetchUserSession = createAsyncThunk(
     try {
       const res = await api.get('/user/login', { withCredentials: true }); 
 
-      if (res.data.status !== 'success') return rejectWithValue(null);
+      if (res.data.status !== 'success') { return rejectWithValue(null);}
 
       console.log(res.data.data)
       const { cart, ...curUser } = res.data.data.user;
