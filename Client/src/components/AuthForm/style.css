@@ -29,15 +29,20 @@
   flex-direction: column;
 }
 .authPage .card-header Button {
-   margin-left: auto;
+  margin-left: auto;
 }
 .authPage p {
-    text-align: center;
+  text-align: center;
 } 
 .authPage .email-sent-content {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    row-gap: 10px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  row-gap: 10px;
+}
+.authPage .login-footer {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
 }
  

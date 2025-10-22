@@ -7,30 +7,30 @@ import jwt from 'jsonwebtoken';
 
 export const get_login = catchAsync(async (req, res, next) => {
     res.set('Cache-Control', 'no-store');
-    console.log('logincheck', req.cookies.token);
+
     if (req.cookies.token) {
-        
-    console.log('chekcing');
+        console.log('chekcing');
         try {
             const decoded = jwt.verify(
                 req.cookies.token,
                 process.env.ACCESS_TOKEN_SECRET
             );
 
-            const currentUser = await User.findById(decoded.id).populate('cart.product');
-            console.log(currentUser);
+            const curUser = await User.findById(decoded.id).populate('cart.product');
+            console.log(curUser);
 
-            if (!currentUser) {
-                return res.status(200).json({ isLogin: false });
+            if (!curUser) {
+                console.log('curUser is null')
+                return res.status(200).json({ status: 'fail' });
             }
         
-            currentUser.password = undefined;
+            curUser.password = undefined;
             res.status(200).json({
                 status: 'success',
-                data: { currentUser },
+                data: { user: curUser },
             });
         } catch (err) {
-        return res.status(200).json({ status: 'fail' });
+            return res.status(200).json({ status: 'fail' });
         }
     } else {
         return res.status(200).json({ status: 'fail' });
@@ -56,7 +56,7 @@ export const post_resetPwd = catchAsync(async (req, res, next) => {
 
     const resetToken = generateRestToken();
 
-    const resetURL = `http://localhost:5173/forgot-password"/${resetToken}`; //send email link
+    const resetURL = `http://localhost:5173/forgot-password/${resetToken}`; //send email link
     console.log(`Click here: ${resetURL}`);
 
     res.status(200).json({

@@ -1,6 +1,5 @@
-import { useState } from 'react';  
+import { useEffect, useState } from 'react';  
 import './style.css';
-import MainLayout from '../../components/UI/mainLayout';
 import {
     Input,
     Drawer,
@@ -31,7 +30,10 @@ const CheckoutPage = ({open, onClose}) => {
     const tax = useSelector(totalTax);
     const discount = useSelector(discountAmount);
     const total = useSelector(totalPrice);
-    
+    useEffect(() => {
+        console.log(cartItems)
+    })
+
     const [form] = Form.useForm();
     const [validateStatus, setValidateStatus] = useState('');
     const [helpText, setHelpText] = useState(''); 
@@ -83,60 +85,64 @@ const CheckoutPage = ({open, onClose}) => {
                 icon={<CloseOutlined />} 
                 onClick={onClose} />
         </div>
-        <div>
-            { cartItems.map((item) => (
-                <CartItemCard key={item.product._id} item={item} />
-            ))}
-        </div>
-        <div className='promo-code-container'>
-            <p>Apply Discount Code</p>
-            <Form 
-                form={form}  
-                layout='horizontal'
-                onFinish={handleApplyCode}
-            >
-                <Form.Item 
-                    name='promo'
-                    validateStatus={validateStatus}
-                    help={helpText}
-                >
-                    <Input 
-                    size='large'
-                    type='text'
-                    placeholder='enter your code'
-                    onChange={handleCodeChange} 
-                    />
-                </Form.Item>
-                <Button 
-                    size='large'
-                    htmlType="submit"
-                    type='primary'
-                > 
-                    Apply 
-                </Button>
-            </Form> 
-        </div>
 
-        <Divider />
-        <div className='cart-footer'>
-            <div className='check-out-text'>
-                <p>Subtotal</p>
-                <p>${parseFloat(subtotal).toFixed(2)}</p>
+        <div className="drawer-body-scroll">
+            <div>
+                { cartItems.map((item) => (
+                    <CartItemCard key={item.product._id} item={item} />
+                ))}
             </div>
-            <div className='check-out-text'>
-                <p>Tax</p>
-                <p>${parseFloat(tax).toFixed(2)}</p>
+            <div className='promo-code-container'>
+                <p>Apply Discount Code</p>
+                <Form 
+                    form={form}  
+                    layout='horizontal'
+                    onFinish={handleApplyCode}
+                >
+                    <Form.Item 
+                        name='promo'
+                        validateStatus={validateStatus}
+                        help={helpText}
+                    >
+                        <Input 
+                        size='large'
+                        type='text'
+                        placeholder='enter your code'
+                        onChange={handleCodeChange} 
+                        />
+                    </Form.Item>
+                    <Button 
+                        size='large'
+                        htmlType="submit"
+                        type='primary'
+                    > 
+                        Apply 
+                    </Button>
+                </Form> 
             </div>
-            <div className='check-out-text'>
-                <p>Discount</p>
-                <p>{ (discount && discount> 0) ? ('-$'+ parseFloat(discount).toFixed(2)) : '--'}</p>
+
+            <Divider />
+            <div className='cart-footer'>
+                <div className='check-out-text'>
+                    <p>Subtotal</p>
+                    <p>${parseFloat(subtotal).toFixed(2)}</p>
+                </div>
+                <div className='check-out-text'>
+                    <p>Tax</p>
+                    <p>${parseFloat(tax).toFixed(2)}</p>
+                </div>
+                <div className='check-out-text'>
+                    <p>Discount</p>
+                    <p>{ (discount && discount> 0) ? ('-$'+ parseFloat(discount).toFixed(2)) : '--'}</p>
+                </div>
+                <div className='check-out-text'>
+                    <p>Estimated total</p>
+                    <p>${parseFloat(total).toFixed(2)}</p>
+                </div>
+                <Button size='large' onClick={()=> console.log(`Your total is ${total}`)}
+                > Continue to checkout </Button>
             </div>
-            <div className='check-out-text'>
-                <p>Estimated total</p>
-                <p>${parseFloat(total).toFixed(2)}</p>
-            </div>
-            <Button size='large'> Continue to checkout </Button>
-        </div>
+         </div>
     </Drawer>
 )};
 

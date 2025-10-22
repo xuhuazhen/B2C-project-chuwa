@@ -21,7 +21,7 @@ export default function MainLayout({ children }) {
       {/* <Header style={{ color: "white", fontSize: 18 }}>
         <ShoppingOutlined /> Product Management
       </Header> */}
-      <AppHeader setOpen={setOpen}/>
+      <AppHeader setOpen={setOpen} />
       <Content style={{ padding: "50px", flex: 1, position: 'relative'}}>
         {children}
         <CheckoutPage open={open} onClose={() => {setOpen(false)}} />
