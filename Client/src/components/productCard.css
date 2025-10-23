@@ -3,3 +3,6 @@
     height: 100%;
     flex-direction: column;
 }
+.edit-button svg {
+    margin: auto;
+}

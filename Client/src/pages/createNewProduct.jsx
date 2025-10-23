@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import {
   Form,
   Input,
@@ -31,6 +31,7 @@ export default function CreateProductPage() {
 
   const { id } = useParams();
   const isEdit = !!id;
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!isEdit) return;
@@ -50,9 +51,8 @@ export default function CreateProductPage() {
         });
 
         setImgUrl(p.image || "");
-      } catch (err) {
-        console.error(err.message);
-        message.error("Failed to load product info");
+      } catch {
+        navigate("/login", { replace: true });
       }
     };
 
