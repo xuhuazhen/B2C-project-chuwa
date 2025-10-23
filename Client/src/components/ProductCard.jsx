@@ -5,11 +5,12 @@ import { useSelector } from "react-redux";
 import { makeSelectCartItemById } from "../store/cart/selectors";
 import Button from "../components/Button";
 import { useDebouncedCartSync } from "../hooks/useDebouncedCartSync";
-import { useDebouncedCartSync } from "../hooks/useDebouncedCartSync";
+import { useNavigate } from "react-router-dom";
 
 const ProductCard = React.memo(({ product }) => {
   const userRole = useSelector((state) => state.user.curUser?.role);
   const { handleAdd, handleQuantity } = useDebouncedCartSync();
+  const navigate = useNavigate();
 
   //Create a memoized selector for this product
   const selectCartItem = React.useMemo(
@@ -20,13 +21,23 @@ const ProductCard = React.memo(({ product }) => {
   //Subscribe to only this cart item
   const cartItem = useSelector(selectCartItem);
 
-  const editProduct = () => {
-    console.log("navigate to product detail");
-  };
+  // const editProduct = () => {
+  //   console.log("navigate to product detail");
+  // };
+
+  const isOutOfStock = product.stock === 0;
+  console.log(isOutOfStock);
 
   return (
     <Card
-      style={{ border: "1px solid #CCC", borderRadius: "4px", width: "100%" }}
+      onClick={() => {
+        navigate(`products/${product._id}`);
+      }}
+      style={{
+        border: "1px solid #CCC",
+        borderRadius: "4px",
+        width: "100%",
+      }}
       styles={{
         cover: {
           padding: "12px",
@@ -40,14 +51,51 @@ const ProductCard = React.memo(({ product }) => {
       }}
       hoverable
       cover={
-        <img
-          src={product.imageURL}
+        <div
           style={{
+            position: "relative",
             height: 198,
-            objectFit: "cover",
+            overflow: "hidden",
             borderRadius: 0,
           }}
-        />
+        >
+          {/* Product Image */}
+          <img
+            src={product.imageURL}
+            alt={product.name}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              display: "block",
+              borderRadius: 0,
+            }}
+          />
+
+          {/* Overlay */}
+          {isOutOfStock && (
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                borderRadius: 0,
+                backgroundColor: "rgba(0,0,0,0.5)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#fff",
+                fontWeight: "bold",
+                fontSize: 16,
+                zIndex: 2,
+              }}
+            >
+              Out of Stock
+            </div>
+          )}
+        </div>
       }
     >
       <div style={{ margin: 0, lineHeight: 1.2 }}>
@@ -88,6 +136,9 @@ const ProductCard = React.memo(({ product }) => {
       >
         {cartItem ? (
           <Button
+            onClick={(e) => {
+              e.stopPropagation(); // prevent redirect
+            }}
             size="small"
             style={{
               width: "110px",
@@ -110,8 +161,18 @@ const ProductCard = React.memo(({ product }) => {
         ) : (
           <Button
             size="small"
-            onClick={() => handleAdd(product)}
-            style={{ width: "110px" }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAdd(product);
+            }}
+            style={{
+              width: "110px",
+              backgroundColor: isOutOfStock ? "#e5e7eb" : "#5048E5",
+              color: isOutOfStock ? "#9ca3af" : "#fff",
+              border: isOutOfStock ? "1px solid #d1d5db" : "none",
+              cursor: isOutOfStock ? "not-allowed" : "pointer",
+            }}
+            disabled={isOutOfStock}
           >
             Add
           </Button>
@@ -125,7 +186,10 @@ const ProductCard = React.memo(({ product }) => {
               color: "#535353",
               border: "1px solid #CCC",
             }}
-            onClick={editProduct}
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate("/admin/create-product");
+            }}
           >
             Edit
           </Button>
