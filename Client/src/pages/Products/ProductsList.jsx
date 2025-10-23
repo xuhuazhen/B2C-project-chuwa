@@ -26,8 +26,9 @@ export default function ProductsList() {
 
   // Set initial limit based on screen width
   useEffect(() => {
-    const width = window.innerWidth;
-    const initialLimit = width >= 1024 ? 10 : width >= 768 ? 6 : 3;
+    // const width = window.innerWidth;
+    // const initialLimit = width >= 1024 ? 10 : width >= 768 ? 6 : 3;
+    const initialLimit = 8;
     dispatch(setLimit(initialLimit));
   }, [dispatch]);
 
