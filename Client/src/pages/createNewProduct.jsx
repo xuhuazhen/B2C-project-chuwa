@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from 'react-router-dom';
 import {
   Form,
   Input,
@@ -17,6 +18,7 @@ import {
   DollarOutlined,
   InboxOutlined,
 } from "@ant-design/icons";
+import api from "../api";
 
 const { Header, Content, Footer } = Layout;
 const { Option } = Select;
@@ -26,6 +28,36 @@ export default function CreateProductPage() {
   const [file, setFile] = useState(null);
   const [imgUrl, setImgUrl] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  const { id } = useParams();
+  const isEdit = !!id;
+
+  useEffect(() => {
+    if (!isEdit) return;
+    
+    const getInfo = async () => {
+      try {
+        const res = await api.get(`/products/${id}`);
+        
+        const p = res.data.product;  
+
+        form.setFieldsValue({
+          name: p.name,
+          description: p.description,
+          category: p.category,
+          price: p.price,
+          stock: p.stock,
+        });
+
+        setImgUrl(p.image || "");
+      } catch (err) {
+        console.error(err.message);
+        message.error("Failed to load product info");
+      }
+    };
+
+    getInfo();
+  }, [id]);
 
   // ---- 预览上传图片 ----
   const previewFile = (file) => {
@@ -114,7 +146,7 @@ export default function CreateProductPage() {
       <Content style={{ padding: "50px", minHeight: "90vh" }}>
         <Row justify="center">
           <Col xs={24} sm={20} md={16} lg={12}>
-            <Card title="Create Product" bordered={false}>
+            <Card title={ !isEdit ? "Create Product" : "Edit Product" }>
               <Form layout="vertical" form={form} onFinish={onFinish}>
                 <Form.Item
                   name="name"
@@ -199,7 +231,7 @@ export default function CreateProductPage() {
                     loading={submitting}
                     block
                   >
-                    Add Product
+                    {!isEdit ? "Add Product" : "Edit Product"}
                   </Button>
                 </Form.Item>
               </Form>

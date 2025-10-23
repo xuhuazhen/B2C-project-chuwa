@@ -1,11 +1,48 @@
 import { catchAsync } from "../utils/catchAsync.js";
 import { AppError } from '../utils/appError.js';
 import { User } from "../models/User.js";
+import { Product } from "../models/Product.js"
 import { DiscountCode } from "../models/DiscountCode.js"
+
+// validate stock
+export const post_validateCartStock = catchAsync(async (req, res, next) => {
+    const { cartItems } = req.body; 
+
+    if ( !cartItems  || cartItems.length === 0) return  next(new AppError('Cart is empty', 400));
+
+    const productIds = cartItems.map(item => item.product);
+    const products = await Product.find({ _id: { $in: productIds } });
+
+    const stockErrors = [];
+
+    for (const item of cartItems) {
+        const product = products.find(prod => prod._id.toString() === item.product);
+
+        if (!product || product.stock < item.quantity) {
+            stockErrors.push(item.product);
+        }
+    } 
+
+    if (stockErrors.length > 0) {
+        return res.status(400).json({
+            status: 'fail',
+            message: 'Some items are out of stock',
+            data: stockErrors,  
+        });
+    }
+
+    res.status(200).json({
+        status: 'success'
+    });
+});
 
 //validate promo code
 export const post_validateCode = catchAsync(async (req, res, next) => {
     const { code }  = req.body;
+
+    console.log('checking promo');
+    if (!code) return next();
+
     const formatCode = code.toUpperCase();  
     
     const discount = await DiscountCode.findOne({ code: formatCode });

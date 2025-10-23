@@ -29,7 +29,6 @@ export default function App() {
             </AuthGuard>
           }
         />
-        <Route path="/admin/create-product" />
         <Route
           path="/products/:id"
           element={
@@ -40,6 +39,16 @@ export default function App() {
         />
         <Route
           path="/admin/create-product"
+          element={
+            <AuthGuard>
+              <RoleGuard requiredRole="admin">
+                <CreateProductPage />
+              </RoleGuard>
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/admin/create-product/:id"
           element={
             <AuthGuard>
               <RoleGuard requiredRole="admin">

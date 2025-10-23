@@ -6,7 +6,7 @@ import {
   post_resetPwd,
   get_logout,
 } from '../controllers/authController.js';
-import { post_shoppingCart, post_validateCode } from '../controllers/userController.js';
+import { post_shoppingCart, post_validateCartStock, post_validateCode } from '../controllers/userController.js';
 import { validation } from '../middlewares/userMiddleware.js';
 
 const router = express.Router();
@@ -18,5 +18,6 @@ router.route('/shopping-cart/:id').post(validation, post_shoppingCart);
 router.get('/logout', get_logout);
 
 router.post('/validatePromoCode', post_validateCode);
+router.post('/checkout', post_validateCode, post_validateCartStock);
 
 export default router;

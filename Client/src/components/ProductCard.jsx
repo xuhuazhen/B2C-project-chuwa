@@ -188,7 +188,7 @@ const ProductCard = React.memo(({ product }) => {
             }}
             onClick={(e) => {
               e.stopPropagation();
-              navigate("/admin/create-product");
+              navigate(`/admin/create-product/${product._id}`);
             }}
           >
             Edit
