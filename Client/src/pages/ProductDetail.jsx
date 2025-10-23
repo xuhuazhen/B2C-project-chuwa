@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { Image, Typography } from "antd";
 
 import { fetchProductById } from "/src/service/productService";
-import  { useDebouncedCartSync }  from '../hooks/useDebouncedCartSync' 
+import { useDebouncedCartSync } from "../hooks/useDebouncedCartSync";
 import MainLayout from "../components/UI/mainLayout";
 
 const { Title, Paragraph } = Typography;
@@ -22,11 +22,12 @@ export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   // const dispatch = useDispatch();
-    const { handleAdd, handleQuantity } = useDebouncedCartSync();
+  const { handleAdd, handleQuantity } = useDebouncedCartSync();
 
   // 兼容不同 slice 命名（任选存在的）
   const user =
-    useSelector((s) => s.user?.user || s.user?.currentUser || s.auth?.user) || null;
+    useSelector((s) => s.user?.user || s.user?.currentUser || s.auth?.user) ||
+    null;
   // const cartItems = useSelector((s) => s.cart?.items || []);
 
   const [loading, setLoading] = useState(true);
@@ -104,7 +105,8 @@ export default function ProductDetail() {
     // }
   };
 
-  const onEdit = () => navigate(`/admin/createNewProduct?id=${prod._id || prod.id}`);
+  const onEdit = () =>
+    navigate(`/admin/createNewProduct?id=${prod._id || prod.id}`);
 
   return (
     <MainLayout>
@@ -124,8 +126,16 @@ export default function ProductDetail() {
 
         {/* 右侧信息 */}
         <div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <Title level={3} style={{ margin: 0 }}>{prod.name}</Title>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Title level={3} style={{ margin: 0 }}>
+              {prod.name}
+            </Title>
             <span
               style={{
                 padding: "4px 8px",
@@ -139,7 +149,9 @@ export default function ProductDetail() {
             </span>
           </div>
 
-          <Title level={4} style={{ marginTop: 12 }}>{money(prod.price)}</Title>
+          <Title level={4} style={{ marginTop: 12 }}>
+            {money(prod.price)}
+          </Title>
           <Paragraph>{prod.description || "No description."}</Paragraph>
 
           <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
@@ -173,7 +185,9 @@ export default function ProductDetail() {
                 Edit
               </button>
             )}
-            <Link to="/" style={{ alignSelf: "center" }}>← Back to Products</Link>
+            <Link to="/" style={{ alignSelf: "center" }}>
+              ← Back to Products
+            </Link>
           </div>
         </div>
       </div>

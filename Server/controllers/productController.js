@@ -8,7 +8,7 @@ import mongoose from 'mongoose';
 export const get_products = catchAsync(async (req, res, next) => {
   console.log("REQ QUERY:", req.query);
 
-  const features = new APIFeatures(Product.find(), req.query) //req.query = page,limit,sort,keyword
+  const features = new APIFeatures(Product.find(), req.query) //req.query = page,limit,sort
     .sort()
     .paginate();
 
