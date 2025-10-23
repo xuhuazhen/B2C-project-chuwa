@@ -1,10 +1,7 @@
 import { catchAsync } from "../utils/catchAsync.js";
 import { Product } from "../models/Product.js";
-<<<<<<< HEAD
 import { APIFeatures } from "../utils/apiFeatures.js";
-=======
-import { AppError } from "../utils/appError.js"; 
->>>>>>> main
+import { AppError } from "../utils/appError.js";
 
 //Return products
 export const get_products = catchAsync(async (req, res, next) => {
@@ -54,6 +51,7 @@ export const get_search = catchAsync(async (req, res, next) => {
     products,
   });
 });
+
 export const get_productById = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const product = await Product.findById(id);
