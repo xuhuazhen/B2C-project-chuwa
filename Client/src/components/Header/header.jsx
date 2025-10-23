@@ -146,7 +146,7 @@ const AppHeader = ({ setOpen }) => {
   };
 
   return (
-    <header style={{ backgroundColor: "#111827" }} className="header">
+    <header style={{ backgroundColor: "#111827" }} className="header" id='app-header'>
       <div
         className="logo"
         onClick={() => {
@@ -180,7 +180,7 @@ const AppHeader = ({ setOpen }) => {
               className="cart-icon"
             />
           </Badge>
-          <span strong className="price">
+          <span className="price">
             $ {parseFloat(subTotal).toFixed(2)}
           </span>
         </div>

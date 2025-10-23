@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';  
+import { useState } from 'react';  
 import './style.css';
 import {
     Input,
@@ -7,9 +7,10 @@ import {
     Button,
     Typography,  
     Form,
+    message,
 } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
-import { CartItemCard } from '../../components/CartItemCard/cardItemCard';
+import { CartItemCard } from '../../components/CartItemCard/cartItemCard';
 
 import { useSelector, useDispatch } from "react-redux";
 import { subTotalPrice, 
@@ -18,6 +19,7 @@ import { subTotalPrice,
     discountAmount, 
     totalTax } from '../../store/cart/cartSelectors';
 import { validatePromoCodeThunk } from '../../store/cart/cartThunk';
+import api from '../../api';
 
 const { Title } = Typography;
 
@@ -29,16 +31,39 @@ const CheckoutPage = ({open, onClose}) => {
     const subtotal = useSelector(subTotalPrice);
     const tax = useSelector(totalTax);
     const discount = useSelector(discountAmount);
-    const total = useSelector(totalPrice);
-    useEffect(() => {
-        console.log(cartItems)
-    })
+    const total = useSelector(totalPrice); 
 
     const [form] = Form.useForm();
     const [validateStatus, setValidateStatus] = useState('');
     const [helpText, setHelpText] = useState(''); 
+    const [promocode, setPromoCode] = useState(null);
+    const [outOfStockIds, setOutOfStockIds] = useState([]);
     
+    const handleCheckOut = async() => { 
+        try {
+            const items = cartItems.map(i => ({
+                product: i.product._id, 
+                quantity: i.quantity
+            }))
+            const res = await api.post('/user/checkout', 
+                { code: promocode, cartItems: items},
+                { withCredentials: true });
+                console.log(res)
+            if (res.data.status === 'success') {
+                console.log(`checkout success. total is ${total}`);
+                setOutOfStockIds([]);
+            }
+        } catch (err) {
+            if (err.response && err.response.data) {
+                console.log(err.response.data);
+                setOutOfStockIds(err.response.data.data);
+            }
+            else message.error(err.message);
+        }
+    }
+
     const handleApplyCode = async() => {
+        setPromoCode(null);
         const codeInput = form.getFieldValue('promo')?.toUpperCase();
         if (!codeInput || !codeInput.trim()) {
             setValidateStatus('error');
@@ -52,6 +77,7 @@ const CheckoutPage = ({open, onClose}) => {
 
         try {
             await dispatch(validatePromoCodeThunk(codeInput)).unwrap(); 
+            setPromoCode(codeInput);
         } catch(err) {
             console.log(err);
             setValidateStatus('error');
@@ -89,7 +115,11 @@ const CheckoutPage = ({open, onClose}) => {
         <div className="drawer-body-scroll">
             <div>
                 { cartItems.map((item) => (
-                    <CartItemCard key={item.product._id} item={item} />
+                    <CartItemCard 
+                        key={item.product._id} 
+                        item={item} 
+                        isOutOfStock={outOfStockIds.includes(item.product._id)}
+                    />
                 ))}
             </div>
             <div className='promo-code-container'>
@@ -139,7 +169,7 @@ const CheckoutPage = ({open, onClose}) => {
                     <p>Estimated total</p>
                     <p>${parseFloat(total).toFixed(2)}</p>
                 </div>
-                <Button size='large' onClick={()=> console.log(`Your total is ${total}`)}
+                <Button size='large' onClick={handleCheckOut}
                 > Continue to checkout </Button>
             </div>
          </div>

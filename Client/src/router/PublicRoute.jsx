@@ -10,8 +10,9 @@ const PublicRoute = ({ children }) => {
     const location = useLocation();
     const { isLoggedIn } = useSelector((state) => state.user);
     const [isChecking, setIsChecking] = useState(true);
+    const [redirect, setRedirect] = useState(false);
 
-   useEffect(() => { 
+  useEffect(() => { 
     console.log("public route active...")
     const check = async () => { 
       try {
@@ -25,16 +26,20 @@ const PublicRoute = ({ children }) => {
     check();
   }, [dispatch]);
 
+  useEffect(() => {
+    if (!isChecking && isLoggedIn &&
+      (
+        location.pathname === '/login' ||
+        location.pathname === '/signup' ||
+        location.pathname === '/forget-pwd')
+      ) {
+          message.warning('You already logged in');
+          setRedirect(true);
+        }
+  }, [isChecking, isLoggedIn, location.pathname]);
+
   if (isChecking) return <LoadingSpin />;
-  
-   if (isLoggedIn && (
-        location.pathname === '/login' 
-        || location.pathname === '/signup' 
-        || location.pathname === '/forget-pwd'))
-    {
-        message.warning('You already logged in');
-    return <Navigate to="/" replace />;
-  }
+  if (redirect) return <Navigate to="/" replace />;
 
   
   return children;
