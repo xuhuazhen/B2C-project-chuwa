@@ -12,10 +12,9 @@ import store, { persistor } from "./store/store";
 ReactDOM.createRoot(document.getElementById("root")).render(
   // <QueryClientProvider client={queryClient}>
   <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}> 
+      <PersistGate loading={null} persistor={persistor}>
         <App />
       </PersistGate>
   </Provider>
-  // sync loacal storge to cart
   // </QueryClientProvider>
 );

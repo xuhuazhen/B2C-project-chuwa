@@ -12,7 +12,7 @@ export const updateCartThunk = createAsyncThunk(
       }));
       console.log('cart to update:', curCart);
 
-      const res = await api.patch(
+      const res = await api.post(
         `user/shopping-cart/${userId}`,
         { cart: curCart },
         { withCredentials: true }
@@ -32,9 +32,10 @@ export const validatePromoCodeThunk = createAsyncThunk(
   'cart/validatePromoCode',
   async(code, { rejectWithValue }) => {
     try {
-      const res = await api.post('user/validatePromoCode', { code }); 
+      const res = await api.post('user/validatePromoCode', { code });
+      console.log(res.data.data);
       return res.data.data;   //code and discountRate
-    } catch (err) { 
+    } catch (err) {
       return rejectWithValue({
         code: null,
         discountRate: 0,

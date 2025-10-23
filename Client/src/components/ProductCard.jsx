@@ -4,7 +4,7 @@ import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import { useSelector } from "react-redux"; 
 import { makeSelectCartItemById } from "../store/cart/selectors";
 import Button from "../components/Button";
-import  { useDebouncedCartSync }  from '../hooks/useDebouncedCartSync' 
+import  { useDebouncedCartSync }  from '../hooks/useDebouncedCartSync'
 
 const ProductCard = React.memo(({ product }) => {
   // const dispatch = useDispatch();
@@ -38,7 +38,7 @@ const ProductCard = React.memo(({ product }) => {
   }
 
   return (
-    <Card
+    <Card  
       style={{ border: "1px solid #CCC", borderRadius: "4px", width: "100%" }}
       styles={{
         cover: {

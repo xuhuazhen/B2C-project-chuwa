@@ -2,12 +2,20 @@ import React from 'react';
 import './cartItemCard.css';
 import { Card, Button } from 'antd';   
 import { useDebouncedCartSync } from '../../hooks/useDebouncedCartSync';
+import { useNavigate } from 'react-router-dom';
 
 export const CartItemCard = ({ item }) => {  
+    const navigate = useNavigate();
     const { handleQuantity, handleRemove } = useDebouncedCartSync();
+    
+    const handleCardClick = () => {
+        navigate(`/products/${item.product._id}`);
+    };
+    
+    const stopPropagation = (e) => e.stopPropagation();
  
     return (
-        <Card size='small' className='cart-card'>
+        <Card size='small' className='cart-card' onClick={handleCardClick}>
             <div className='cart-card-container'>
                 <img src={item.product.imageURL} alt={item.product.name} className='cart-card-img'/>
 
@@ -21,14 +29,22 @@ export const CartItemCard = ({ item }) => {
 
                     <div className='cart-card-bottom'>
                         <div className='cart-card-button-group'>
-                            <Button size='small' onClick={() => handleQuantity(item.product._id, item.quantity - 1)}>-</Button>
+                            <Button size='small' onClick={(e) => {
+                                stopPropagation(e);
+                                handleQuantity(item.product._id, item.quantity - 1)
+                                }}>-</Button>
                             <input 
                                 size='small'
                                 type='text'
                                 value={item.quantity}
+                                onClick={stopPropagation}
+                                onFocus={stopPropagation} 
                                 onChange={(e) => handleQuantity(item.product._id, Number(e.target.value))}
                             />
-                            <Button size='small' onClick={() => handleQuantity(item.product._id, item.quantity + 1)}>+</Button>
+                            <Button size='small'onClick={(e) => {
+                                stopPropagation(e); 
+                                handleQuantity(item.product._id, item.quantity + 1)
+                                }}>+</Button>
                         </div>
                         <Button
                             style={{border: 'none', textDecoration: 'underline'}}

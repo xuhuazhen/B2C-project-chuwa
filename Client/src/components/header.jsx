@@ -1,4 +1,3 @@
-import React from "react";
 import { Layout, Input, Avatar, Badge, Typography, Space, Flex, message } from "antd";
 import { UserOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import SearchProduct from "./SearchBar";
@@ -9,6 +8,8 @@ import { resetCart } from '../store/cart/cartSlice';
 import { subTotalPrice, totalCartItem } from '../store/cart/cartSelectors';
 import { useNavigate } from 'react-router-dom'; 
 import api from "../api";
+import { useEffect } from "react";
+import { initGlobalMessage } from '../utils/messageConfig'
 
 
 const { Header } = Layout;
@@ -23,6 +24,10 @@ const AppHeader = ({setOpen}) => {
   const user = useSelector((state) => state.user); 
   console.log(subTotal)
 
+  useEffect(() => {
+    initGlobalMessage();
+  },[]);
+
   const handleClick = async() => {
     console.log("log", user.isLoggedIn)
     if (!user.isLoggedIn) return navigate('/login');
@@ -33,7 +38,8 @@ const AppHeader = ({setOpen}) => {
       if (res.data.status  === 'success') {
         dispatch(logout());
         dispatch(resetCart());
-        return navigate('/');
+        message.success('Logout succeessful');
+        return navigate('/', { replace: true });
       }
     } catch(err) {
         if (err.response && err.response.data.message) message.error(err.response.data.message);
