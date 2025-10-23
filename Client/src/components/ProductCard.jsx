@@ -6,6 +6,7 @@ import { makeSelectCartItemById } from "../store/cart/selectors";
 import Button from "../components/Button";
 import { useDebouncedCartSync } from "../hooks/useDebouncedCartSync";
 import { useNavigate } from "react-router-dom";
+import './productCard.css';
 
 const ProductCard = React.memo(({ product }) => {
   const userRole = useSelector((state) => state.user.curUser?.role);
@@ -37,6 +38,10 @@ const ProductCard = React.memo(({ product }) => {
         border: "1px solid #CCC",
         borderRadius: "4px",
         width: "100%",
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between'
+
       }}
       styles={{
         cover: {
@@ -132,6 +137,8 @@ const ProductCard = React.memo(({ product }) => {
           gap: "6px",
           fontSize: "10px",
           padding: "12px 0",
+          flexWrap: "wrap",
+          marginTop: "auto"
         }}
       >
         {cartItem ? (
@@ -140,11 +147,12 @@ const ProductCard = React.memo(({ product }) => {
               e.stopPropagation(); // prevent redirect
             }}
             size="small"
-            style={{
-              width: "110px",
+            style={{ 
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
+              flex: "1 1", 
+              padding: '0px 10px',
             }}
           >
             <MinusOutlined
@@ -166,7 +174,8 @@ const ProductCard = React.memo(({ product }) => {
               handleAdd(product);
             }}
             style={{
-              width: "110px",
+              flex: "1 1", 
+              padding: '0px 10px',
               backgroundColor: isOutOfStock ? "#e5e7eb" : "#5048E5",
               color: isOutOfStock ? "#9ca3af" : "#fff",
               border: isOutOfStock ? "1px solid #d1d5db" : "none",
@@ -181,7 +190,8 @@ const ProductCard = React.memo(({ product }) => {
           <Button
             size="small"
             style={{
-              width: "110px",
+              flex: "1 1", 
+              padding: '0px 10px',
               backgroundColor: "#fff",
               color: "#535353",
               border: "1px solid #CCC",
