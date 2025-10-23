@@ -1,14 +1,14 @@
 import React from "react";
 import { Card } from "antd";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
-import { useSelector } from "react-redux"; 
+import { useSelector } from "react-redux";
 import { makeSelectCartItemById } from "../store/cart/selectors";
 import Button from "../components/Button";
-import  { useDebouncedCartSync }  from '../hooks/useDebouncedCartSync'
+import { useDebouncedCartSync } from "../hooks/useDebouncedCartSync";
+import { useDebouncedCartSync } from "../hooks/useDebouncedCartSync";
 
 const ProductCard = React.memo(({ product }) => {
-  // const dispatch = useDispatch();
-  const userRole = useSelector(state => state.user.curUser?.role);
+  const userRole = useSelector((state) => state.user.curUser?.role);
   const { handleAdd, handleQuantity } = useDebouncedCartSync();
 
   //Create a memoized selector for this product
@@ -20,25 +20,12 @@ const ProductCard = React.memo(({ product }) => {
   //Subscribe to only this cart item
   const cartItem = useSelector(selectCartItem);
 
-  // const addToCartHandler = () => {
-  //   dispatch(addToCart(product));
-  //   console.log(product);
-  // };
-
-  // const incrementHandler = () => {
-  //   dispatch(incrementItemQuantity(product._id));
-  //   console.log(product._id);
-  // };
-  // const decrementHandler = () => {
-  //   dispatch(decrementItemQuantity(product._id));
-  // };
-
   const editProduct = () => {
-    console.log('navigate to product detail');
-  }
+    console.log("navigate to product detail");
+  };
 
   return (
-    <Card  
+    <Card
       style={{ border: "1px solid #CCC", borderRadius: "4px", width: "100%" }}
       styles={{
         cover: {
@@ -100,10 +87,25 @@ const ProductCard = React.memo(({ product }) => {
         }}
       >
         {cartItem ? (
-          <Button size="small" style={{ width: "110px" }}>
-            <MinusOutlined onClick={() => handleQuantity(product._id, cartItem.quantity - 1)} />
+          <Button
+            size="small"
+            style={{
+              width: "110px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <MinusOutlined
+              style={{ fontSize: "15px" }}
+              onClick={() => handleQuantity(product._id, cartItem.quantity - 1)}
+            />
             <span>{cartItem?.quantity || 0}</span>
-            <PlusOutlined onClick={() => handleQuantity(product._id, cartItem.quantity + 1)} />
+
+            <PlusOutlined
+              style={{ fontSize: "15px" }}
+              onClick={() => handleQuantity(product._id, cartItem.quantity + 1)}
+            />
           </Button>
         ) : (
           <Button
@@ -114,7 +116,7 @@ const ProductCard = React.memo(({ product }) => {
             Add
           </Button>
         )}
-        { userRole === 'admin' &&
+        {userRole === "admin" && (
           <Button
             size="small"
             style={{
@@ -127,7 +129,7 @@ const ProductCard = React.memo(({ product }) => {
           >
             Edit
           </Button>
-        }
+        )}
       </div>
     </Card>
   );

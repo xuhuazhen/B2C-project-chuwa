@@ -1,10 +1,16 @@
-// Client/src/App.jsx
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"; 
-// import Products from "/src/pages/Products/Products.jsx";
+import { Flex, Layout } from "antd";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import CreateProductPage from "./pages/createNewProduct";
+import AppHeader from "./components/header";
+import AppFooter from "./components/footer";
+const { Header, Footer, Sider, Content } = Layout;
+import LoginPage from "./pages/Login";
+import SignupPage from "./pages/Signup";
+import ChangePwdPage from "./pages/ChangePwd";
 import Products from "./pages/Products/ProductsList";
 import ProductDetail from "/src/pages/ProductDetail.jsx"; // ← 这里没有 /Products 目录
-import CreateProductPage from './pages/createNewProduct';
-import LoginPage from './pages/Login';
+import CreateProductPage from "./pages/createNewProduct";
+import LoginPage from "./pages/Login";
 import SignupPage from "./pages/Signup";
 import ChangePwdPage from "./pages/ChangePwd";
 import ErrorPage from "./pages/Error";
@@ -13,17 +19,23 @@ import RoleGuard from './router/RoleGuard';
 import PublicRoute from './router/PublicRoute';
 
 export default function App() {
+  useEffect(() => {
+    initGlobalMessage();
+  }, []);
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" 
+        <Route
+          path="/"
           element={
-          <AuthGuard allowGuest={true}>
-            <Products />
-          </AuthGuard>
-          } 
+            <AuthGuard allowGuest={true}>
+              <Products />
+            </AuthGuard>
+          }
         />
+        <Route
+          path="/admin/create-product"
         <Route path="/products/:id" element={
           <AuthGuard allowGuest={true}>
             <ProductDetail />
@@ -38,32 +50,33 @@ export default function App() {
                 <CreateProductPage />
               </RoleGuard>
             </AuthGuard>
-          } 
+          }
         />
-        <Route 
-          path="/login" 
+        <Route
+          path="/login"
           element={
             <PublicRoute>
               <LoginPage />
             </PublicRoute>
           }
         />
-        <Route 
-          path="/signup" 
+        <Route
+          path="/signup"
           element={
             <PublicRoute>
               <SignupPage />
             </PublicRoute>
           }
         />
-        <Route 
-          path="/forget-pwd" 
+        <Route
+          path="/forget-pwd"
           element={
-          <PublicRoute>
-            <ChangePwdPage />
-          </PublicRoute>
-          } 
+            <PublicRoute>
+              <ChangePwdPage />
+            </PublicRoute>
+          }
         />
+        <Route path="*" element={<ErrorPage />} />
         <Route path='*' element={
           <PublicRoute>
             <ErrorPage />

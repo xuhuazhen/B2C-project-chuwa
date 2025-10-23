@@ -1,0 +1,148 @@
+.header {
+  display: grid;
+  grid-template-areas: "logo search actions";
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 60px;
+  padding: 8px 64px;
+  background: #111827;
+}
+
+.logo {
+  grid-area: logo;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.logo h4 {
+  color: #fff;
+  margin: 0;
+  font-size: 32px;
+}
+
+.logo span {
+  color: #fff;
+  font-size: 12px;
+  margin-left: 10px;
+}
+
+.search-bar {
+  grid-area: search;
+  max-width: 500px;
+}
+
+.header-actions {
+  grid-area: actions;
+  display: flex;
+  align-items: center;
+  gap: 26px;
+}
+
+.user-info,
+.cart-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.user-avatar {
+  position: relative;
+  display: inline-block;
+}
+
+.user-icon {
+  color: #fff;
+  font-size: 30px;
+}
+
+.star {
+  color: #fce944;
+  font-size: 14px;
+  position: absolute;
+  top: 17px;
+  right: -2px;
+}
+
+.cart-icon {
+  color: #fff;
+  font-size: 30px;
+}
+
+.user-name,
+.price {
+  color: #fff;
+  font-size: 16px;
+}
+
+.price {
+  font-size: 16px;
+}
+
+/* TABLET VIEW */
+@media (max-width: 1024px) {
+  .header {
+    grid-template-areas:
+      "logo actions"
+      "search search";
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    padding: 14px 24px;
+  }
+  .search-bar {
+    grid-area: search;
+    max-width: 100%;
+  }
+}
+
+/* MOBILE VIEW */
+@media (max-width: 767px) {
+  .header {
+    grid-template-areas:
+      "logo actions"
+      "search search";
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    padding: 14px 24px;
+  }
+
+  .logo {
+    grid-area: logo;
+  }
+
+  .logo span {
+    margin-left: 0;
+  }
+
+  .search-bar {
+    grid-area: search;
+    max-width: 100%;
+  }
+  .header-actions {
+    grid-area: actions;
+    justify-self: end;
+  }
+
+  .user-icon {
+    font-size: 24px;
+  }
+
+  .user-name {
+    display: none;
+  }
+
+  .star {
+    font-size: 11px;
+    top: 14px;
+    right: -2px;
+  }
+
+  .cart-icon {
+    font-size: 24px;
+  }
+
+  .price {
+    font-size: 10px;
+  }
+}
