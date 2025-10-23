@@ -1,24 +1,17 @@
 import api from "../api";
 
 //Get all products API
-export const getProducts = async (page = 1, limit = 10, sort) => {
-  const params = new URLSearchParams();
-
-  params.append("page", page);
-  params.append("limit", limit);
-
-  if (sort) params.append("sort", sort);
-
-  const res = await api.get(`/products?${params.toString()}`);
+export const getProducts = async (
+  page = 1,
+  limit = 10,
+  sort = "-createdAt"
+) => {
+  const url = `/products?page=${page}&limit=${limit}&sort=${sort}`;
+  // console.log("Fetching URL:", url);
+  const res = await api.get(url);
   return res.data;
-
-  // 获取全部
-  // export const getProducts = async () => {
-  //   const res = await api.get("/products");
-  //   return res.data;
 };
 
-// 获取单个
 export const getProductById = async (id) => {
   const res = await api.get(`/products/${id}`);
   return res.data;

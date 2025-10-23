@@ -4,13 +4,13 @@ import { fetchProductThunk } from "./productThunk";
 const productsSlice = createSlice({
   name: "products",
   initialState: {
-    products: [],
+    products: {}, //page-based cache
     currentPage: 1,
     totalPages: 0,
     limit: 10,
+    sort: "-createdAt",
     loading: false,
     error: null,
-    sort: "-createdAt",
   },
   reducers: {
     setCurrentPage: (state, action) => {
@@ -18,6 +18,11 @@ const productsSlice = createSlice({
     },
     setSort: (state, action) => {
       state.sort = action.payload;
+      state.currentPage = 1;
+      state.products = {}; //Clear cache when sort changes
+    },
+    setLimit: (state, action) => {
+      state.limit = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -27,12 +32,11 @@ const productsSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchProductThunk.fulfilled, (state, action) => {
+        const { page, products, totalPages } = action.payload;
         state.loading = false;
-        state.products = action.payload.products || [];
-        state.totalPages = action.payload.pagination?.totalPages || 1;
-        state.limit = action.payload.pagination.limit;
+        state.products[page] = products; //cache products by page
+        state.totalPages = totalPages;
       })
-
       .addCase(fetchProductThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
@@ -40,6 +44,5 @@ const productsSlice = createSlice({
   },
 });
 
-export const { setCurrentPage, setSort, setSearch, clearSearchResults } =
-  productsSlice.actions;
+export const { setCurrentPage, setSort, setLimit } = productsSlice.actions;
 export default productsSlice.reducer;

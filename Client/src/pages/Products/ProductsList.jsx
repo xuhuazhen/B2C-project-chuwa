@@ -6,7 +6,11 @@ import { DownOutlined } from "@ant-design/icons";
 import Button from "../../components/Button";
 import { Space, Flex, Typography, Dropdown, Pagination, Spin } from "antd";
 import { fetchProductThunk } from "../../store/product/productThunk";
-import { setCurrentPage, setSort } from "../../store/product/productSlice";
+import {
+  setCurrentPage,
+  setSort,
+  setLimit,
+} from "../../store/product/productSlice";
 import { useNavigate } from "react-router-dom";
 import "./ProductsList.css";
 
@@ -20,44 +24,31 @@ export default function ProductsList() {
 
   const userRole = useSelector((store) => store.user.curUser?.role);
 
-  // Fixed limit based on initial screen width
-  const getInitialLimit = () => {
-    const width = window.innerWidth;
-    if (width >= 1024) return 10; // desktop
-    if (width >= 768) return 6; // tablet
-    return 3; // mobile
-  };
-
-  // Fetch products when page changes
+  // Set initial limit based on screen width
   useEffect(() => {
-    dispatch(
-      fetchProductThunk({
-        page: currentPage,
-        limit: getInitialLimit(),
-        sort,
-      })
-    );
-  }, [dispatch, currentPage, limit, sort]);
+    const width = window.innerWidth;
+    const initialLimit = width >= 1024 ? 10 : width >= 768 ? 6 : 3;
+    dispatch(setLimit(initialLimit));
+  }, [dispatch]);
+
+  // Fetch only if not cached
+  useEffect(() => {
+    if (!products[currentPage]) {
+      dispatch(fetchProductThunk({ page: currentPage, limit, sort }));
+    }
+  }, [dispatch, currentPage, limit, sort, products]);
+
+  const productResults = products[currentPage] || [];
+
+  const items = [
+    { key: "price", label: "Price: low to high" },
+    { key: "-price", label: "Price: high to low" },
+    { key: "-createdAt", label: "Last Added" },
+  ];
 
   const sortChangeHandler = ({ key }) => {
     dispatch(setSort(key));
-    // console.log(key);
-    dispatch(setCurrentPage(1));
   };
-
-  const items = [
-    {
-      key: "price",
-      label: "Price: low to high",
-      onClick: sortChangeHandler,
-    },
-    {
-      key: "-price",
-      label: "Price: high to low",
-      onClick: sortChangeHandler,
-    },
-    { key: "-createdAt", label: "Last Added", onClick: sortChangeHandler },
-  ];
 
   const SortDropdown = () => (
     <Dropdown
@@ -65,6 +56,7 @@ export default function ProductsList() {
         items,
         selectable: true,
         selectedKeys: [sort],
+        onClick: sortChangeHandler,
       }}
     >
       <Button
@@ -79,7 +71,7 @@ export default function ProductsList() {
           fontWeight: 600,
         }}
       >
-        <Space style={{ borderRadius: "4px" }}>
+        <Space>
           {items.find((i) => i.key === sort)?.label}
           <DownOutlined />
         </Space>
@@ -113,12 +105,12 @@ export default function ProductsList() {
         </Flex>
       </Flex>
 
-      {loading ? (
+      {loading && !products.length ? (
         <Spin tip="Loading products..." />
       ) : (
         <>
           <div className="product-grid">
-            {products.map((product) => (
+            {productResults.map((product) => (
               <div className="product-item" key={product._id}>
                 <ProductCard product={product} />
               </div>
