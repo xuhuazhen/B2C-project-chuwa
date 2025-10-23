@@ -1,0 +1,48 @@
+.authPage {
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+  background-color: #f7f8fa;
+}
+.authPage .ant-card {
+  width: 80vw;
+  min-width: 300px;
+  max-width: 600px;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.authPage .ant-card .ant-card-head {
+  min-height: 0;
+  border-bottom: none;
+  padding: 0;
+  display: flex;
+  justify-content: flex-end;
+} 
+.authPage .ant-card .ant-card-head-title {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+}
+.authPage .card-header {
+  display: flex;
+  flex-direction: column;
+}
+.authPage .card-header Button {
+  margin-left: auto;
+}
+.authPage p {
+  text-align: center;
+} 
+.authPage .email-sent-content {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  row-gap: 10px;
+}
+.authPage .login-footer {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+ 

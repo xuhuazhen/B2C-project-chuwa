@@ -1,6 +1,6 @@
 import { message } from 'antd';
 
-export const initGlobalMessage = ({ headerId = '#app-header', offset = 0, maxCount = 3 } = {}) => {
+export const initGlobalMessage = ({ headerId = '#app-header', offset = 10, maxCount = 3 } = {}) => {
     let top = offset;
 
     const headerEl = document.querySelector(headerId);

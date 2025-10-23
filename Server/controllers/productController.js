@@ -1,6 +1,10 @@
 import { catchAsync } from "../utils/catchAsync.js";
 import { Product } from "../models/Product.js";
+<<<<<<< HEAD
 import { APIFeatures } from "../utils/apiFeatures.js";
+=======
+import { AppError } from "../utils/appError.js"; 
+>>>>>>> main
 
 //Return products
 export const get_products = catchAsync(async (req, res, next) => {
@@ -49,4 +53,10 @@ export const get_search = catchAsync(async (req, res, next) => {
     results: products.length,
     products,
   });
+});
+export const get_productById = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const product = await Product.findById(id);
+  if (!product) return next(new AppError("Product not found", 404));
+  res.status(200).json({ status: "success", product });
 });
