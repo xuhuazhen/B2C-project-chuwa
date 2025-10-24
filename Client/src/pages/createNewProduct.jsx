@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   Form,
   Input,
@@ -12,11 +12,11 @@ import {
   Card,
   message,
 } from "antd";
-import { DollarOutlined, InboxOutlined, ShoppingOutlined } from "@ant-design/icons";
+import { DollarOutlined, InboxOutlined } from "@ant-design/icons";
 import api from "../api";
 import MainLayout from "../components/UI/mainLayout";
 
-const { Header, Content, Footer } = Layout;
+const { Content } = Layout;
 const { Option } = Select;
 
 const CATEGORY_OPTIONS = ["Outerwear", "Bottoms", "Activewear", "Footwear", "Accessories"];
@@ -28,8 +28,7 @@ export default function CreateProductPage() {
   const [submitting, setSubmitting] = useState(false);
 
   const { id } = useParams();
-  const isEdit = !!id;
-  const navigate = useNavigate();
+  const isEdit = !!id; 
 
   useEffect(() => {
     if (!isEdit) return;
@@ -128,15 +127,18 @@ export default function CreateProductPage() {
         image: finalImageUrl || "",
       };
 
-      const resp = await api.post("/products", payload);
+      const resp = isEdit ? await api.post(`/products/${id}`, payload) : await api.post("/products", payload);
+ 
       if (!(resp.status >= 200 && resp.status < 300)) {
         throw new Error("Failed to create product");
       }
 
       message.success(isEdit ? "Product updated!" : "Product created successfully!");
-      form.resetFields();
-      setFile(null);
-      setImgUrl("");
+      if (!isEdit) {
+        form.resetFields();
+        setFile(null);
+        setImgUrl("");
+      }
       // navigate("/"); // 需要的话跳转
     } catch (e) {
       console.error(e);

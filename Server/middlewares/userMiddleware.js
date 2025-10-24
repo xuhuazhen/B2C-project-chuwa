@@ -4,16 +4,14 @@ import { AppError } from '../utils/appError.js';
 import { User } from '../models/User.js'; 
 
 //make user has permission
-export const roleValidation = (role) => {
-    catchAsync(async (req, res, next) =>  {
-        if (req.user.role !== role) {
-            return next(
-                new AppError('You do not have permission to perform this action', 403)
-            );
-        }
-        next();
-    });
-}
+export const roleValidation = (requiredRole) => {
+  return (req, res, next) => {
+    if (!req.user) return next(new AppError('User not authenticated', 401));
+    if (req.user.role !== requiredRole)
+      return next(new AppError('You do not have permission to perform this action', 403));
+    next();
+  };
+};
 
 // Make sure token is valid
 export const validation = catchAsync(async (req, res, next) => {
@@ -42,9 +40,9 @@ export const validation = catchAsync(async (req, res, next) => {
 
     // assign data inside the token to the request body so that we can directly access these data in the request object in the route handler functions
     req.user = {
-        userId: decoded.id,
-        email: decoded.email,
-        role: decoded.role,
+        userId: curUser._id,
+        email: curUser.email,
+        role: curUser.role,
     };
 
     next();
