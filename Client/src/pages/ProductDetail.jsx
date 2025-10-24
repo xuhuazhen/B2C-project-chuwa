@@ -6,12 +6,10 @@ import { Image, Typography, message } from "antd";
 import { fetchProductById } from "/src/service/productService";
 import { useDebouncedCartSync } from "../hooks/useDebouncedCartSync";
 import MainLayout from "../components/UI/mainLayout";
+import { getImage } from "../utils/getImage";
 
 const { Title, Paragraph } = Typography;
-const PLACEHOLDER = "https://via.placeholder.com/600x400?text=No+Image";
-
-// 统一取图：兼容 imageURL / imageUrl / image / img
-const getImage = (p) => p?.imageUrl || p?.imageURL || p?.image || p?.img || "";
+const PLACEHOLDER = "/no-image.png"; // 本地占位图（放在 Client/public/no-image.png）
 
 const money = (n) => {
   const num = Number(n);
@@ -22,10 +20,10 @@ export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // 购物车同步（你项目已有的 hook）
+  // 购物车同步
   const { handleAdd, handleQuantity } = useDebouncedCartSync();
 
-  // 兼容不同 slice 命名（任选存在的）
+  // 兼容不同 slice 命名
   const user =
     useSelector((s) => s.user?.user || s.user?.currentUser || s.auth?.user) ||
     null;
@@ -33,7 +31,7 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [prod, setProd] = useState(null);
   const [err, setErr] = useState("");
-  const [qty, setQty] = useState(1); // ✅ 数量（允许到 0）
+  const [qty, setQty] = useState(1);
 
   useEffect(() => {
     (async () => {
@@ -69,7 +67,7 @@ export default function ProductDetail() {
 
   const inStock = stockNumber > 0;
 
-  // ✅ 数量控制：0..stock
+  // 数量控制：0..stock
   const inc = () => {
     if (!inStock) return;
     setQty((q) => {
@@ -79,21 +77,17 @@ export default function ProductDetail() {
     });
   };
 
-  const dec = () => {
-    // 允许到 0；如果你希望“到 0 即自动移除”，可在这里调用 handleQuantity(pid, 0)
-    setQty((q) => Math.max(0, q - 1));
-  };
+  const dec = () => setQty((q) => Math.max(0, q - 1));
 
-  // 提交：qty===0 走移除，>0 走加入（支持一次性加 qty）
+  // 提交：qty===0 移除；>0 加入 qty 件
   const onAddToCart = async () => {
-    if (!inStock && qty > 0) return; // 无库存时不允许新增
     const pid = prod?._id || prod?.id;
     try {
       if (qty === 0) {
-        await Promise.resolve(handleQuantity?.(pid, 0)); // 设为 0 = 移除
+        await Promise.resolve(handleQuantity?.(pid, 0));
         message.success("Removed from cart");
       } else {
-        await Promise.resolve(handleAdd?.(prod, qty)); // 一次性加入 qty
+        await Promise.resolve(handleAdd?.(prod, qty));
         message.success("Added to cart");
       }
     } catch (e) {
@@ -102,7 +96,8 @@ export default function ProductDetail() {
     }
   };
 
-  const onEdit = () => navigate(`/admin/createNewProduct?id=${prod._id || prod.id}`);
+  const onEdit = () =>
+    navigate(`/admin/createNewProduct?id=${prod._id || prod.id}`);
 
   return (
     <MainLayout>
@@ -115,7 +110,6 @@ export default function ProductDetail() {
             width="100%"
             fallback={PLACEHOLDER}
             placeholder
-            onError={(e) => (e.currentTarget.src = PLACEHOLDER)}
             style={{ borderRadius: 8 }}
           />
         </div>
@@ -150,7 +144,7 @@ export default function ProductDetail() {
           </Title>
           <Paragraph>{prod.description || "No description."}</Paragraph>
 
-          {/* ✅ 数量 +/- 控件（允许到 0） */}
+          {/* 数量 +/- 控件（允许到 0） */}
           <div
             style={{
               display: "flex",
@@ -161,7 +155,7 @@ export default function ProductDetail() {
           >
             <button
               onClick={dec}
-              disabled={!inStock || qty <= 0}
+              disabled={qty <= 0}
               aria-label="decrease"
               style={{
                 width: 36,
@@ -169,7 +163,7 @@ export default function ProductDetail() {
                 borderRadius: 8,
                 border: "1px solid #ddd",
                 background: "#fff",
-                cursor: !inStock || qty <= 0 ? "not-allowed" : "pointer",
+                cursor: qty <= 0 ? "not-allowed" : "pointer",
                 fontSize: 18,
                 lineHeight: "34px",
               }}
@@ -217,12 +211,9 @@ export default function ProductDetail() {
                   padding: "8px 16px",
                   borderRadius: 8,
                   border: "1px solid #000",
-                  background:
-                    (!inStock && qty > 0) ? "#eee" : "#000",
-                  color:
-                    (!inStock && qty > 0) ? "#999" : "#fff",
-                  cursor:
-                    (!inStock && qty > 0) ? "not-allowed" : "pointer",
+                  background: !inStock && qty > 0 ? "#eee" : "#000",
+                  color: !inStock && qty > 0 ? "#999" : "#fff",
+                  cursor: !inStock && qty > 0 ? "not-allowed" : "pointer",
                 }}
               >
                 {qty === 0 ? "Remove" : "Add to Cart"}
@@ -242,7 +233,7 @@ export default function ProductDetail() {
                 Edit
               </button>
             )}
-            <Link to="/" style={{ alignSelf: "center" }}>
+            <Link to="/products" style={{ alignSelf: "center" }}>
               ← Back to Products
             </Link>
           </div>

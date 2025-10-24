@@ -6,28 +6,27 @@ import { makeSelectCartItemById } from "../store/cart/selectors";
 import Button from "../components/Button";
 import { useDebouncedCartSync } from "../hooks/useDebouncedCartSync";
 import { useNavigate } from "react-router-dom";
-import './productCard.css';
+import "./productCard.css";
+
+// 统一取图：兼容 imageURL / imageUrl / image / img
+const getImage = (p) => p?.imageUrl || p?.imageURL || p?.image || p?.img || "";
+
+const PLACEHOLDER = "/no-image.png"; // 放在 Client/public/no-image.png
 
 const ProductCard = React.memo(({ product }) => {
   const userRole = useSelector((state) => state.user.curUser?.role);
   const { handleAdd, handleQuantity } = useDebouncedCartSync();
   const navigate = useNavigate();
 
-  //Create a memoized selector for this product
   const selectCartItem = React.useMemo(
     () => makeSelectCartItemById(product._id),
     [product._id]
   );
-
-  //Subscribe to only this cart item
   const cartItem = useSelector(selectCartItem);
 
-  // const editProduct = () => {
-  //   console.log("navigate to product detail");
-  // };
+  const isOutOfStock = Number(product?.stock ?? 0) === 0;
 
-  const isOutOfStock = product.stock === 0;
-  console.log(isOutOfStock);
+  const src = getImage(product) || PLACEHOLDER;
 
   return (
     <Card
@@ -36,23 +35,16 @@ const ProductCard = React.memo(({ product }) => {
       }}
       style={{
         border: "1px solid #CCC",
-        borderRadius: "4px",
+        borderRadius: 4,
         width: "100%",
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between'
-
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
       }}
       styles={{
-        cover: {
-          padding: "12px",
-        },
-        body: {
-          padding: "0 12px 0 12px",
-        },
-        actions: {
-          borderTop: "none",
-        },
+        cover: { padding: 12 },
+        body: { padding: "0 12px 0 12px" },
+        actions: { borderTop: "none" },
       }}
       hoverable
       cover={
@@ -64,10 +56,15 @@ const ProductCard = React.memo(({ product }) => {
             borderRadius: 0,
           }}
         >
-          {/* Product Image */}
           <img
-            src={product.imageURL}
+            src={src}
             alt={product.name}
+            onError={(e) => {
+              // 如果字段是空或加载失败，强制替换为本地占位图
+              if (e.currentTarget.src !== window.location.origin + PLACEHOLDER) {
+                e.currentTarget.src = PLACEHOLDER;
+              }
+            }}
             style={{
               width: "100%",
               height: "100%",
@@ -77,15 +74,11 @@ const ProductCard = React.memo(({ product }) => {
             }}
           />
 
-          {/* Overlay */}
           {isOutOfStock && (
             <div
               style={{
                 position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
+                inset: 0,
                 borderRadius: 0,
                 backgroundColor: "rgba(0,0,0,0.5)",
                 display: "flex",
@@ -134,35 +127,32 @@ const ProductCard = React.memo(({ product }) => {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          gap: "6px",
-          fontSize: "10px",
+          gap: 6,
+          fontSize: 10,
           padding: "12px 0",
           flexWrap: "wrap",
-          marginTop: "auto"
+          marginTop: "auto",
         }}
       >
         {cartItem ? (
           <Button
-            onClick={(e) => {
-              e.stopPropagation(); // prevent redirect
-            }}
+            onClick={(e) => e.stopPropagation()}
             size="small"
-            style={{ 
+            style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              flex: "1 1", 
-              padding: '0px 10px',
+              flex: "1 1",
+              padding: "0 10px",
             }}
           >
             <MinusOutlined
-              style={{ fontSize: "15px" }}
+              style={{ fontSize: 15 }}
               onClick={() => handleQuantity(product._id, cartItem.quantity - 1)}
             />
             <span>{cartItem?.quantity || 0}</span>
-
             <PlusOutlined
-              style={{ fontSize: "15px" }}
+              style={{ fontSize: 15 }}
               onClick={() => handleQuantity(product._id, cartItem.quantity + 1)}
             />
           </Button>
@@ -171,11 +161,11 @@ const ProductCard = React.memo(({ product }) => {
             size="small"
             onClick={(e) => {
               e.stopPropagation();
-              handleAdd(product);
+              if (!isOutOfStock) handleAdd(product);
             }}
             style={{
-              flex: "1 1", 
-              padding: '0px 10px',
+              flex: "1 1",
+              padding: "0 10px",
               backgroundColor: isOutOfStock ? "#e5e7eb" : "#5048E5",
               color: isOutOfStock ? "#9ca3af" : "#fff",
               border: isOutOfStock ? "1px solid #d1d5db" : "none",
@@ -186,12 +176,13 @@ const ProductCard = React.memo(({ product }) => {
             Add
           </Button>
         )}
+
         {userRole === "admin" && (
           <Button
             size="small"
             style={{
-              flex: "1 1", 
-              padding: '0px 10px',
+              flex: "1 1",
+              padding: "0 10px",
               backgroundColor: "#fff",
               color: "#535353",
               border: "1px solid #CCC",

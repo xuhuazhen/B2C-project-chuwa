@@ -18,13 +18,7 @@ import api from "../api";
 const { Header, Content, Footer } = Layout;
 const { Option } = Select;
 
-const CATEGORY_OPTIONS = [
-  "Outerwear",
-  "Bottoms",
-  "Activewear",
-  "Footwear",
-  "Accessories",
-];
+const CATEGORY_OPTIONS = ["Outerwear", "Bottoms", "Activewear", "Footwear", "Accessories"];
 
 export default function CreateProductPage() {
   const [form] = Form.useForm();
@@ -58,17 +52,15 @@ export default function CreateProductPage() {
         message.error("Failed to load product info");
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, isEdit]);
+  }, [id, isEdit, form]);
 
-  // 预览本地上传图片
+  // 本地预览
   const previewFile = (f) => {
     const url = URL.createObjectURL(f);
     setImgUrl(url);
     setFile(f);
   };
 
-  // 阻止 Upload 默认上传，先本地预览
   const uploadProps = {
     multiple: false,
     showUploadList: false,
@@ -78,7 +70,7 @@ export default function CreateProductPage() {
     },
   };
 
-  // 从后端拿 S3 签名
+  // 取签名
   async function getSignedUrlFromServer(f) {
     const res = await api.get("/upload/sign", {
       params: {
@@ -86,10 +78,9 @@ export default function CreateProductPage() {
         contentType: f.type || "application/octet-stream",
       },
     });
-    return res.data; // { uploadUrl, publicUrl, key, expiresIn }
+    return res.data; // { uploadUrl, publicUrl, ... }
   }
-
-  // PUT 到 S3
+  // PUT S3
   async function uploadToS3(f, uploadUrl) {
     const r = await fetch(uploadUrl, {
       method: "PUT",
@@ -99,12 +90,10 @@ export default function CreateProductPage() {
     if (!r.ok) throw new Error("Upload to S3 failed");
   }
 
-  // 提交
   const onFinish = async (values) => {
     try {
       setSubmitting(true);
 
-      // 基本数值防呆
       const priceNum = Number(values.price);
       const stockNum = Number(values.stock);
       if (Number.isNaN(priceNum) || priceNum < 0) {
@@ -116,7 +105,7 @@ export default function CreateProductPage() {
         return;
       }
 
-      // 决定最后的图片 URL
+      // 决定最终图片
       let finalImageUrl = imgUrl;
       const imageInput = values.imageInput?.trim();
       const usingDirectLink = imageInput && imageInput.startsWith("http");
@@ -138,7 +127,6 @@ export default function CreateProductPage() {
         image: finalImageUrl || "",
       };
 
-      // 创建（如果将来支持编辑，这里切换成 api.put(`/products/${id}`, payload)）
       const resp = await api.post("/products", payload);
       if (!(resp.status >= 200 && resp.status < 300)) {
         throw new Error("Failed to create product");
@@ -148,9 +136,7 @@ export default function CreateProductPage() {
       form.resetFields();
       setFile(null);
       setImgUrl("");
-
-      // 可选：跳转到列表或详情
-      // navigate("/products"); // 如果你有对应的路由就放开
+      // navigate("/"); // 需要的话跳转
     } catch (e) {
       console.error(e);
       message.error(e.message || "Something went wrong");
@@ -170,11 +156,7 @@ export default function CreateProductPage() {
           <Col xs={24} sm={20} md={16} lg={12}>
             <Card title={!isEdit ? "Create Product" : "Edit Product"}>
               <Form layout="vertical" form={form} onFinish={onFinish}>
-                <Form.Item
-                  name="name"
-                  label="Product Name"
-                  rules={[{ required: true, message: "Please enter name" }]}
-                >
+                <Form.Item name="name" label="Product Name" rules={[{ required: true, message: "Please enter name" }]}>
                   <Input placeholder="iWatch" />
                 </Form.Item>
 
@@ -200,30 +182,20 @@ export default function CreateProductPage() {
                   </Col>
 
                   <Col span={12}>
-                    <Form.Item
-                      name="price"
-                      label="Price ($)"
-                      rules={[{ required: true, message: "Enter price" }]}
-                    >
+                    <Form.Item name="price" label="Price ($)" rules={[{ required: true, message: "Enter price" }]}>
                       <Input prefix={<DollarOutlined />} type="number" min={0} step="0.01" />
                     </Form.Item>
                   </Col>
                 </Row>
 
-                <Form.Item
-                  name="stock"
-                  label="In Stock Quantity"
-                  rules={[{ required: true, message: "Enter stock" }]}
-                >
+                <Form.Item name="stock" label="In Stock Quantity" rules={[{ required: true, message: "Enter stock" }]}>
                   <Input type="number" min={0} step="1" />
                 </Form.Item>
 
-                {/* 直接填图片链接（可选） */}
                 <Form.Item name="imageInput" label="Add Image Link (optional)">
                   <Input placeholder="https://example.com/image.png" />
                 </Form.Item>
 
-                {/* 或者上传图片 */}
                 <Form.Item label="Or Upload Image">
                   <Upload.Dragger {...uploadProps}>
                     <p className="ant-upload-drag-icon">
@@ -233,17 +205,11 @@ export default function CreateProductPage() {
                     <p className="ant-upload-hint">PNG, JPG, WEBP allowed</p>
                   </Upload.Dragger>
 
-                  {/* 仅在本地预览时展示（imgUrl 是 blob:） */}
                   {imgUrl && !imgUrl.startsWith("http") && (
                     <img
                       src={imgUrl}
                       alt="preview"
-                      style={{
-                        width: "100%",
-                        marginTop: 20,
-                        borderRadius: 8,
-                        objectFit: "cover",
-                      }}
+                      style={{ width: "100%", marginTop: 20, borderRadius: 8, objectFit: "cover" }}
                     />
                   )}
                 </Form.Item>
