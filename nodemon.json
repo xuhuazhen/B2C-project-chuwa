@@ -1,0 +1,6 @@
+{
+  "watch": ["Server"],
+  "ext": "js,json",
+  "exec": "node Server/index.js",
+  "ignore": ["Client", "node_modules", ".git", "**/*.png", "**/*.jpg", "**/*.webp"]
+}

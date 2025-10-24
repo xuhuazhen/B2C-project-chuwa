@@ -17,34 +17,57 @@ import errController from "./controllers/errController.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Applying middleware
 const app = express();
-app.use(
-  cors({
-    origin: "http://localhost:5173", // 前端地址
-    credentials: true,
-  })
-);
+
+// 打印每个请求，方便排查
+app.use((req, res, next) => {
+  console.log(`[REQ] ${req.method} ${req.originalUrl}`);
+  next();
+});
+
+// ---- CORS（注意：不要再写 app.options("*") 了）----
+const corsOptions = {
+  origin: "http://localhost:5173",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+app.use(cors(corsOptions));
+
+// 兼容 express v5：手动处理 OPTIONS 预检
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    res.header("Access-Control-Allow-Origin", corsOptions.origin);
+    res.header("Access-Control-Allow-Methods", corsOptions.methods.join(","));
+    res.header("Access-Control-Allow-Headers", corsOptions.allowedHeaders.join(","));
+    res.header("Access-Control-Allow-Credentials", "true");
+    return res.sendStatus(204);
+  }
+  next();
+});
+
+// 解析 body & 静态资源
 app.use(cookieParser());
-app.use(express.json());
+app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-app.use(express.static(path.join(__dirname, "public"))); // serve static files
+app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", (req, res) => {
   res.json("Hello");
 });
 
+// 路由（注意这里仅写“路径片段”，不要写完整 URL）
 app.use("/api/products", productRouter);
 app.use("/api", uploadRoutes);
 app.use("/api/user", userRouter);
 
-// Catch-all route for unsupported paths
+// 404
 app.use((req, res, next) => {
-  next(
-    new AppError("Sorry, we couldn’t find the page you’re looking for.", 404)
-  );
+  next(new AppError("Sorry, we couldn’t find the page you’re looking for.", 404));
 });
+
+// 统一错误处理（务必是最后一个）
 app.use(errController);
 
 export default app;
