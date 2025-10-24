@@ -1,13 +1,13 @@
 export class APIFeatures {
   constructor(query, queryString) {
-    this.query = query;
-    this.queryString = queryString;
+    this.query = query; //Mongoose query Product.find()
+    this.queryString = queryString; //query parameters from the URL
   }
 
   //Sorting by price, -price, latest
   sort() {
     if (this.queryString.sort) {
-      const sortBy = this.queryString.sort.split().join(" ");
+      const sortBy = this.queryString.sort.split().join(" "); //convert params into moongose sort
       this.query = this.query.sort(sortBy);
     } else {
       this.query = this.query.sort("-createdAt");
@@ -31,7 +31,7 @@ export class APIFeatures {
 
   //Get pagination metadata
   async getPaginationData(model) {
-    const total = await model.countDocuments(this.query.getQuery()); //filtered count
+    const total = await model.countDocuments(this.query.getQuery()); //count maching items after filting
     const totalPages = Math.ceil(total / this.limit) || 1;
 
     return {

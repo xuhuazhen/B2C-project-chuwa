@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 
 // GET /api/products
 export const get_products = catchAsync(async (req, res, next) => {
-  console.log("[REQ QUERY]:", req.query);
+  console.log("REQ QUERY:", req.query);
 
   const features = new APIFeatures(Product.find(), req.query).sort().paginate();
   const products = await features.query.lean();
@@ -25,7 +25,9 @@ export const get_products = catchAsync(async (req, res, next) => {
 export const get_search = catchAsync(async (req, res, next) => {
   const query = req.query.q || "";
   if (!query.trim()) {
-    return res.status(200).json({ status: "success", results: 0, products: [] });
+    return res
+      .status(200)
+      .json({ status: "success", results: 0, products: [] });
   }
   const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const regex = new RegExp(escapeRegex(query), "i");
