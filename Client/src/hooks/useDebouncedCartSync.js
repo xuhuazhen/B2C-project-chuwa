@@ -1,56 +1,78 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { updateQuantity, removeItem, addToCart } from '../store/cart/cartSlice';
 import { updateCartThunk } from '../store/cart/cartThunk';
-import store from "../store/store";
+import store from '../store/store';
 import { debounce } from 'lodash';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 
+export const useDebouncedCartSync = (wait = 300) => {
+  const dispatch = useDispatch();
+  // 仅用于触发重渲染，确保登录态变化后 hook 内逻辑最新
+  const user = useSelector((s) => s.user);
 
-export const useDebouncedCartSync  = (wait = 300) => {
-    const dispatch = useDispatch(); 
-    const user = useSelector(state => state.user);
-    const userId = user.curUser?._id;
- 
-    //remember the shpping cart sync with backend
-    const lastSyncedCart = useRef(
-        store.getState().cart.items.map(i => ({
-            product: i.product._id,
-            quantity: i.quantity
-        }))
-    );
+  const snapshot = () => {
+    const st = store.getState();
+    return (st.cart?.items || []).map((i) => ({
+      product: i.product._id || i.product.id,
+      quantity: i.quantity,
+    }));
+  };
 
-    const debouncedUpdate = useRef(
-        debounce((prevCart) => { 
-            console.log("debounce to database", userId); 
-            dispatch(updateCartThunk({ userId, prevCart }))
-                .unwrap()
-                .then((updatedCart) => {
-                    lastSyncedCart.current = updatedCart.map(i => ({
-                        product: i.product._id,
-                        quantity: i.quantity
-                    }));
-                });
-        }, wait),
-    ).current;
+  // 记录上一次已成功同步到后端的购物车快照
+  const lastSyncedCart = useRef(snapshot());
 
-    const handleQuantity = (productId, qty) => {
-        if (qty < 1) return;
-        dispatch(updateQuantity({ productId, quantity: qty }));
-        //同步状态到后端, lastSyncedCart记录未更新后端前的数据 
-        if (user.isLoggedIn) debouncedUpdate(lastSyncedCart.current);
-    };
+  // 注意：每次触发时取 store 里的最新 userId，避免闭包过期
+  const debouncedUpdate = useMemo(
+    () =>
+      debounce((prevCart) => {
+        const latestUserId = store.getState()?.user?.curUser?._id;
+        if (!latestUserId) return;
+        // 把“变更前”的快照传给 thunk 做回滚依据
+        dispatch(updateCartThunk({ userId: latestUserId, prevCart }))
+          .unwrap()
+          .then((updatedCart) => {
+            // 后端返回成功后，刷新 lastSyncedCart
+            lastSyncedCart.current = (updatedCart || []).map((i) => ({
+              product: i.product._id || i.product.id,
+              quantity: i.quantity,
+            }));
+          })
+          .catch(() => {
+            // 失败时，thunk 内部应做回滚；这里无需抛错
+          });
+      }, wait),
+    [dispatch, wait]
+  );
 
-    const handleRemove = (productId) => { 
-        dispatch(removeItem(productId));
-        //同步状态到后端, lastSyncedCart记录未更新后端前的数据
-        if (user.isLoggedIn) debouncedUpdate(lastSyncedCart.current);
+  // 设定某商品的“目标数量”
+  // 约定：qty <= 0 则移除该商品
+  const handleQuantity = (productId, qty) => {
+    const prev = lastSyncedCart.current;
+    if (qty <= 0) {
+      dispatch(removeItem(productId));
+    } else {
+      dispatch(updateQuantity({ productId, quantity: qty }));
     }
-    
-    const handleAdd = (product) => { 
-        dispatch(addToCart(product));
-        //同步状态到后端, lastSyncedCart记录未更新后端前的数据
-        if (user.isLoggedIn) debouncedUpdate(lastSyncedCart.current);
-    };
+    if (user.isLoggedIn) debouncedUpdate(prev);
+  };
 
-    return { handleQuantity, handleRemove, handleAdd};
+  const handleRemove = (productId) => {
+    const prev = lastSyncedCart.current;
+    dispatch(removeItem(productId));
+    if (user.isLoggedIn) debouncedUpdate(prev);
+  };
+
+  // 新增：支持一次性添加多个（qty 默认 1）
+  // 兼容两种 reducer 写法：
+  // - addToCart(product)
+  // - addToCart({ product, qty })
+  const handleAdd = (product, qty = 1) => {
+    const prev = lastSyncedCart.current;
+    // 若你的 reducer 只收 product，这里传入 product 也能工作（等于 +1）
+    // 若你的 reducer 支持 {product, qty}，则可一次性 +qty
+    dispatch(qty === 1 ? addToCart(product) : addToCart({ product, qty }));
+    if (user.isLoggedIn) debouncedUpdate(prev);
+  };
+
+  return { handleQuantity, handleRemove, handleAdd };
 };
