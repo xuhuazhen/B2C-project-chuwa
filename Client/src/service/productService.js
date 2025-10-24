@@ -1,11 +1,7 @@
 import api from "../api";
 
 //Get all products API
-export const getProducts = async (
-  page = 1,
-  limit = 10,
-  sort = "-createdAt"
-) => {
+export const getProducts = async (page = 1, limit = 8, sort = "-createdAt") => {
   const url = `/products?page=${page}&limit=${limit}&sort=${sort}`;
   // console.log("Fetching URL:", url);
   const res = await api.get(url);

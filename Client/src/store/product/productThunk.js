@@ -3,10 +3,7 @@ import { getProducts } from "../../service/productService";
 
 export const fetchProductThunk = createAsyncThunk(
   "products/fetchProducts",
-  async (
-    { page = 1, limit = 10, sort = "-createdAt" },
-    { rejectWithValue }
-  ) => {
+  async ({ page = 1, limit = 8, sort = "-createdAt" }, { rejectWithValue }) => {
     try {
       const data = await getProducts(page, limit, sort);
       return {
