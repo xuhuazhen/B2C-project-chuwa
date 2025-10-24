@@ -43,7 +43,7 @@ export const get_search = catchAsync(async (req, res, next) => {
   const regex = new RegExp(escapeRegex(query), "i");
 
   const products = await Product.find({ name: { $regex: regex } })
-    .limit(10)
+    .limit(8)
     .select("name _id")
     .lean();
 

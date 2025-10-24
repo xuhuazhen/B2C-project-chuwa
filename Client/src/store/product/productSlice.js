@@ -7,7 +7,7 @@ const productsSlice = createSlice({
     products: {}, //page-based cache
     currentPage: 1,
     totalPages: 0,
-    limit: 10,
+    limit: 8,
     sort: "-createdAt",
     loading: false,
     error: null,

@@ -9,7 +9,7 @@ import searchReducer from "./search/searchSlice";
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["cart","products"], // 仅持久化 cart，避免将敏感 user 信息放 localStorage
+  whitelist: ["cart"], // 仅持久化 cart，避免将敏感 user 信息放 localStorage
 };
 
 const rootReducer = combineReducers({
