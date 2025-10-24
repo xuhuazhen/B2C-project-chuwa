@@ -23,13 +23,15 @@ const ProductCard = React.memo(({ product }) => {
     [product._id]
   );
   const cartItem = useSelector(selectCartItem);
-  const productsCache = useSelector((state) => state.products.products);
 
-  // flatten 所有页的 products
-  const allProducts = Object.values(productsCache).flat(); // [].flat() 会把二维数组合并成一维
+  const latestProduct = useSelector((state) => {
+    const allProductsArrays = Object.values(state.products.products); // 所有缓存页
+    const allProducts = allProductsArrays.flat(); // flatten 成一个大数组
+    return allProducts.find((p) => p._id === product._id); // 找到对应 product
+  });
 
-  const latestProduct = allProducts.find((p) => p._id === product._id);
-  const currentStock = Number(latestProduct?.stock ?? product?.stock ?? 0);
+const currentStock = Number(latestProduct?.stock ?? product?.stock ?? 0);
+
   const isOutOfStock = currentStock <= 0;
   // const isOutOfStock = Number(product?.stock ?? 0) === 0;
 
