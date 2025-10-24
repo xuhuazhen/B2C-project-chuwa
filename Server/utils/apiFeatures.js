@@ -1,13 +1,15 @@
 export class APIFeatures {
   constructor(query, queryString) {
-    this.query = query;
-    this.queryString = queryString;
+    this.query = query; //Mongoose query Product.find()
+    this.queryString = queryString; //query parameters from the URL
+    this.page = parseInt(queryString.page) || 1;
+    this.limit = parseInt(queryString.limit) || 8;
   }
 
   //Sorting by price, -price, latest
   sort() {
     if (this.queryString.sort) {
-      const sortBy = this.queryString.sort.split().join(" ");
+      const sortBy = this.queryString.sort.split().join(" "); //convert params into moongose sort
       this.query = this.query.sort(sortBy);
     } else {
       this.query = this.query.sort("-createdAt");
@@ -17,21 +19,14 @@ export class APIFeatures {
 
   //Pagination
   paginate() {
-    const page = parseInt(this.queryString.page, 8) || 1;
-    const limit = parseInt(this.queryString.limit, 8) || 8;
-    const skip = (page - 1) * limit;
-
-    //page=3&limit=8
-    this.query = this.query.skip(skip).limit(limit);
-
-    this.page = page; //save page
-    this.limit = limit; //save limit
+    const skip = (this.page - 1) * this.limit;
+    this.query = this.query.skip(skip).limit(this.limit);
     return this;
   }
 
   //Get pagination metadata
   async getPaginationData(model) {
-    const total = await model.countDocuments(this.query.getQuery()); //filtered count
+    const total = await model.countDocuments(this.query.getQuery()); //count maching items after filting
     const totalPages = Math.ceil(total / this.limit) || 1;
 
     return {

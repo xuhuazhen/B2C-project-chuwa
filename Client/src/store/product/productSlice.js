@@ -1,28 +1,37 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { fetchProductThunk } from "./productThunk";
 
+//Load saved preferences (page, sort, limit)
+const savedPage = Number(localStorage.getItem("page")) || 1;
+const savedSort = localStorage.getItem("sort") || "-createdAt";
+const savedLimit = Number(localStorage.getItem("limit")) || 8;
+
 const productsSlice = createSlice({
   name: "products",
   initialState: {
-    products: {}, //page-based cache
-    currentPage: 1,
+    products: {}, // cached by `${page}-${limit}-${sort}`
+    currentPage: savedPage,
+    sort: savedSort,
+    limit: savedLimit,
     totalPages: 0,
-    limit: 8,
-    sort: "-createdAt",
     loading: false,
     error: null,
   },
   reducers: {
     setCurrentPage: (state, action) => {
       state.currentPage = action.payload;
+      localStorage.setItem("page", action.payload);
     },
     setSort: (state, action) => {
       state.sort = action.payload;
+      localStorage.setItem("sort", action.payload);
       state.currentPage = 1;
-      state.products = {}; //Clear cache when sort changes
+      localStorage.setItem("page", 1);
+      state.products = {}; //clear cache when sort changes
     },
     setLimit: (state, action) => {
       state.limit = action.payload;
+      localStorage.setItem("limit", action.payload);
     },
   },
   extraReducers: (builder) => {
@@ -32,14 +41,14 @@ const productsSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchProductThunk.fulfilled, (state, action) => {
-        const { page, products, totalPages } = action.payload;
+        const { products, totalPages, cacheKey } = action.payload;
         state.loading = false;
-        state.products[page] = products; //cache products by page
+        state.products[cacheKey] = products; //use backend-provided cacheKey
         state.totalPages = totalPages;
       })
       .addCase(fetchProductThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload || action.error.message;
       });
   },
 });
