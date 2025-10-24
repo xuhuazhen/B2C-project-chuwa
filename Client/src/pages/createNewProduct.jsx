@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Form,
   Input,
@@ -35,6 +35,7 @@ export default function CreateProductPage() {
 
   const { id } = useParams();
   const isEdit = !!id;
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!isEdit) return;
@@ -80,7 +81,6 @@ export default function CreateProductPage() {
 
   // 从后端拿 S3 签名
   async function getSignedUrlFromServer(f) {
-        console.log("get signed url")
     const res = await api.get("/upload/sign", {
       params: {
         filename: f.name,
@@ -121,16 +121,15 @@ export default function CreateProductPage() {
       let finalImageUrl = imgUrl;
       const imageInput = values.imageInput?.trim();
       const usingDirectLink = imageInput && imageInput.startsWith("http");
- 
-      if (usingDirectLink) { 
+
+      if (usingDirectLink) {
         finalImageUrl = imageInput;
       } else if (file && !imgUrl.startsWith("http")) {
-        console.log("file")
         const { uploadUrl, publicUrl } = await getSignedUrlFromServer(file);
         await uploadToS3(file, uploadUrl);
         finalImageUrl = publicUrl;
       }
-      
+
       const payload = {
         name: values.name.trim(),
         description: values.description?.trim() || "",
@@ -139,6 +138,7 @@ export default function CreateProductPage() {
         stock: stockNum,
         image: finalImageUrl || "",
       };
+
       // 创建（如果将来支持编辑，这里切换成 api.put(`/products/${id}`, payload)）
       const resp = await api.post("/products", payload);
       if (!(resp.status >= 200 && resp.status < 300)) {
@@ -161,11 +161,7 @@ export default function CreateProductPage() {
   };
 
   return (
-    <MainLayout> 
-      {/* <Header style={{ color: "white", fontSize: 18 }}>
-        <ShoppingOutlined /> Product Management
-      </Header> */}
-
+    <MainLayout>
       <Content style={{ padding: "50px", minHeight: "90vh" }}>
         <Row justify="center">
           <Col xs={24} sm={20} md={16} lg={12}>
@@ -259,8 +255,6 @@ export default function CreateProductPage() {
           </Col>
         </Row>
       </Content>
-
-      {/* <Footer style={{ textAlign: "center" }}>©2025 Product Management System</Footer> */}
     </MainLayout>
   );
 }
