@@ -35,14 +35,11 @@ export const useDebouncedCartSync = (wait = 300) => {
     }, wait)
   ).current;
 
-  // 允许 qty = 0 => 移除
   const handleQuantity = (productId, qty) => {
-    if (qty <= 0) {
-      dispatch(removeItem(productId));
-    } else {
-      dispatch(updateQuantity({ productId, quantity: qty }));
-    }
-    if (user.isLoggedIn) debouncedUpdate(lastSyncedCart.current);
+    const prev = lastSyncedCart.current; 
+    dispatch(updateQuantity({ productId, quantity: qty }));
+    
+    if (user.isLoggedIn) debouncedUpdate(prev);
   };
 
   // 一次性加入 qty 件

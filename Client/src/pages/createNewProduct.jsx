@@ -14,6 +14,7 @@ import {
 } from "antd";
 import { DollarOutlined, InboxOutlined, ShoppingOutlined } from "@ant-design/icons";
 import api from "../api";
+import MainLayout from "../components/UI/mainLayout";
 
 const { Header, Content, Footer } = Layout;
 const { Option } = Select;
@@ -146,11 +147,7 @@ export default function CreateProductPage() {
   };
 
   return (
-    <Layout>
-      <Header style={{ color: "white", fontSize: 18 }}>
-        <ShoppingOutlined /> Product Management
-      </Header>
-
+    <MainLayout>
       <Content style={{ padding: "50px", minHeight: "90vh" }}>
         <Row justify="center">
           <Col xs={24} sm={20} md={16} lg={12}>
@@ -224,8 +221,6 @@ export default function CreateProductPage() {
           </Col>
         </Row>
       </Content>
-
-      <Footer style={{ textAlign: "center" }}>©2025 Product Management System</Footer>
-    </Layout>
+    </MainLayout>
   );
 }
