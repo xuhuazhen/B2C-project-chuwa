@@ -6,12 +6,10 @@ import { Image, Typography, message } from "antd";
 import { fetchProductById } from "/src/service/productService";
 import { useDebouncedCartSync } from "../hooks/useDebouncedCartSync";
 import MainLayout from "../components/UI/mainLayout";
+import { getImage } from "../utils/getImage";
 
 const { Title, Paragraph } = Typography;
-const PLACEHOLDER = "https://via.placeholder.com/600x400?text=No+Image";
-
-// 统一取图：兼容 imageURL / imageUrl / image / img
-const getImage = (p) => p?.imageUrl || p?.imageURL || p?.image || p?.img || "";
+const PLACEHOLDER = "/no-image.png"; // 本地占位图（放在 Client/public/no-image.png）
 
 const money = (n) => {
   const num = Number(n);
@@ -31,7 +29,7 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [prod, setProd] = useState(null);
   const [err, setErr] = useState("");
-  const [qty, setQty] = useState(1); // ✅ 数量（允许到 0）
+  const [qty, setQty] = useState(1);
 
   // 获取cart中对应的item
   const cartItems = useSelector((state) => state.cart.items || []);
@@ -119,7 +117,7 @@ export default function ProductDetail() {
     handleQuantity(prod._id, next);
   };
 
-  const dec = async () => {
+  const dec = () => {
     const next = Math.max(qty - 1, 1);
     setQty(next);
      handleQuantity(prod._id, next);
@@ -159,7 +157,6 @@ export default function ProductDetail() {
             width="100%"
             fallback={PLACEHOLDER}
             placeholder
-            onError={(e) => (e.currentTarget.src = PLACEHOLDER)}
             style={{ borderRadius: 8 }}
           />
         </div>
@@ -205,7 +202,7 @@ export default function ProductDetail() {
           >
             <button
               onClick={dec}
-              disabled={!inStock || qty <= 0}
+              disabled={qty <= 0}
               aria-label="decrease"
               style={{
                 width: 36,
@@ -213,7 +210,7 @@ export default function ProductDetail() {
                 borderRadius: 8,
                 border: "1px solid #ddd",
                 background: "#fff",
-                cursor: !inStock || qty <= 0 ? "not-allowed" : "pointer",
+                cursor: qty <= 0 ? "not-allowed" : "pointer",
                 fontSize: 18,
                 lineHeight: "34px",
               }}
@@ -262,12 +259,9 @@ export default function ProductDetail() {
                   padding: "8px 16px",
                   borderRadius: 8,
                   border: "1px solid #000",
-                  background:
-                    (!inStock && qty > 0) ? "#eee" : "#000",
-                  color:
-                    (!inStock && qty > 0) ? "#999" : "#fff",
-                  cursor:
-                    (!inStock && qty > 0) ? "not-allowed" : "pointer",
+                  background: !inStock && qty > 0 ? "#eee" : "#000",
+                  color: !inStock && qty > 0 ? "#999" : "#fff",
+                  cursor: !inStock && qty > 0 ? "not-allowed" : "pointer",
                 }}
               >
                 {inCart ? "Remove" : "Add to Cart"}

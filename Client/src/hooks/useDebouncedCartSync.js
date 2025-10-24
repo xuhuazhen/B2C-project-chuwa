@@ -3,7 +3,7 @@ import { updateQuantity, removeItem, addToCart } from '../store/cart/cartSlice';
 import { updateCartThunk } from '../store/cart/cartThunk';
 import store from '../store/store';
 import { debounce } from 'lodash';
-import { useMemo, useRef } from 'react';
+import { useRef } from 'react';
 import { message } from 'antd';
 
 export const useDebouncedCartSync = (wait = 500) => {
