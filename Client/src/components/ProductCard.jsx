@@ -1,5 +1,5 @@
 import React from "react";
-import { Card } from "antd";
+import { Card, message } from "antd";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import { useSelector } from "react-redux";
 import { makeSelectCartItemById } from "../store/cart/selectors";
@@ -27,7 +27,21 @@ const ProductCard = React.memo(({ product }) => {
   const isOutOfStock = Number(product?.stock ?? 0) === 0;
 
   const src = getImage(product) || PLACEHOLDER;
+ 
+  const handleButtonClick = (value) => {
+    const updateQty = cartItem.quantity + value;
 
+    if (updateQty < 1) {
+      message.warning("Quantity cannot be less than 1");
+      return;
+    }
+    if (updateQty > product.stock) {
+      message.info("Quantity cannot exceed stock");
+      return;
+    }
+
+    handleQuantity(product._id, updateQty); 
+  }
   return (
     <Card
       onClick={() => {
@@ -146,15 +160,15 @@ const ProductCard = React.memo(({ product }) => {
               padding: "0 10px",
             }}
           >
-            <MinusOutlined className="edit-button"
+            <MinusOutlined className="edit-button" 
               style={{ fontSize: "15px", width: "100%" }}
-              onClick={() => handleQuantity(product._id, cartItem.quantity - 1)}
+              onClick={() => handleButtonClick(-1)}
             />
             <span>{cartItem?.quantity || 0}</span>
 
-            <PlusOutlined className="edit-button"
+            <PlusOutlined className="edit-button" 
               style={{ fontSize: "15px", width: "100%"  }}
-              onClick={() => handleQuantity(product._id, cartItem.quantity + 1)}
+              onClick={() => handleButtonClick(1)}
             />
           </Button>
         ) : (

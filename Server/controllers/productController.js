@@ -99,3 +99,56 @@ export const create_product = catchAsync(async (req, res, next) => {
 
   res.status(201).json({ status: "success", product });
 });
+
+export const post_product = catchAsync(async (req, res, next) => {
+  const id = req.params.id;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return next(new AppError("Invalid product", 400));
+  }
+
+  const allowedFields = ["name", "description", "category", "price", "stock", "image", "imageUrl", "imageURL", "img", "isActive"];
+  const updates = {};
+
+  for (const key of allowedFields) {
+    if (req.body[key] !== undefined) {
+      updates[key] = req.body[key];
+    }
+  }
+
+  // 检验数值字段
+  if (updates.price !== undefined) {
+    const priceNum = Number(updates.price);
+    if (Number.isNaN(priceNum) || priceNum < 0) {
+      return next(new AppError("`price` must be a non-negative number.", 400));
+    }
+    updates.price = priceNum;
+  }
+
+  if (updates.stock !== undefined) {
+    const stockNum = Number(updates.stock);
+    if (!Number.isInteger(stockNum) || stockNum < 0) {
+      return next(new AppError("`stock` must be a non-negative integer.", 400));
+    }
+    updates.stock = stockNum;
+  }
+
+  // 处理图片字段，优先级 image > imageUrl > imageURL > img
+  if (updates.image || updates.imageUrl || updates.imageURL || updates.img) {
+    updates.image = updates.image || updates.imageUrl || updates.imageURL || updates.img;
+  }
+
+  // 查找并更新
+  const product = await Product.findByIdAndUpdate(id, updates, {
+    new: true,      // 返回更新后的 document
+    runValidators: true, // 触发 schema 校验
+  });
+
+  if (!product) return next(new AppError("Product not found", 404));
+
+  res.status(200).json({
+    status: "success",
+    message: "Product updated successfully",
+    product,
+  });
+});
