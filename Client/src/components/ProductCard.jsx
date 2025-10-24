@@ -23,19 +23,26 @@ const ProductCard = React.memo(({ product }) => {
     [product._id]
   );
   const cartItem = useSelector(selectCartItem);
+  const productsCache = useSelector((state) => state.products.products);
 
-  const isOutOfStock = Number(product?.stock ?? 0) === 0;
+  // flatten 所有页的 products
+  const allProducts = Object.values(productsCache).flat(); // [].flat() 会把二维数组合并成一维
+
+  const latestProduct = allProducts.find((p) => p._id === product._id);
+  const currentStock = Number(latestProduct?.stock ?? product?.stock ?? 0);
+  const isOutOfStock = currentStock <= 0;
+  // const isOutOfStock = Number(product?.stock ?? 0) === 0;
 
   const src = getImage(product) || PLACEHOLDER;
  
   const handleButtonClick = (value) => {
     const updateQty = cartItem.quantity + value;
-
+    console.log(updateQty,currentStock)
     if (updateQty < 1) {
       message.warning("Quantity cannot be less than 1");
       return;
     }
-    if (updateQty > product.stock) {
+    if (updateQty > currentStock) {
       message.info("Quantity cannot exceed stock");
       return;
     }

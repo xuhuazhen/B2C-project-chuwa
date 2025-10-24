@@ -44,7 +44,7 @@ const AppHeader = ({ setOpen }) => {
         dispatch(logout());
         dispatch(resetCart());
         message.success("Logout succeessful");
-        return navigate("/", { replace: true });
+        return navigate("/");
       }
     } catch (err) {
       if (err.response && err.response.data.message)
@@ -58,7 +58,7 @@ const AppHeader = ({ setOpen }) => {
       <div
         className="logo"
         onClick={() => {
-          navigate("/");
+          navigate("/", { replace: true });
         }}
       >
         <h4>
