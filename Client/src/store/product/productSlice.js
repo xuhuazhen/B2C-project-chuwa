@@ -33,6 +33,15 @@ const productsSlice = createSlice({
       state.limit = action.payload;
       localStorage.setItem("limit", action.payload);
     },
+    resetProducts: (state) => {
+      state.currentPage = 1;
+      state.sort = "-createdAt";
+      state.limit = 8;
+      state.products = {};
+      localStorage.setItem("page", 1);
+      localStorage.setItem("sort", "-createdAt");
+      localStorage.setItem("limit", 8);
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -53,5 +62,6 @@ const productsSlice = createSlice({
   },
 });
 
-export const { setCurrentPage, setSort, setLimit } = productsSlice.actions;
+export const { setCurrentPage, setSort, setLimit, resetProducts } =
+  productsSlice.actions;
 export default productsSlice.reducer;

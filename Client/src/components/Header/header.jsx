@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../../api";
 import { useEffect } from "react";
 import { initGlobalMessage } from "../../utils/messageConfig";
+import { resetProducts } from "../../store/product/productSlice";
 
 const AppHeader = ({ setOpen }) => {
   const navigate = useNavigate();
@@ -54,10 +55,15 @@ const AppHeader = ({ setOpen }) => {
   };
 
   return (
-    <header style={{ backgroundColor: "#111827" }} className="header" id='app-header'>
+    <header
+      style={{ backgroundColor: "#111827" }}
+      className="header"
+      id="app-header"
+    >
       <div
         className="logo"
         onClick={() => {
+          dispatch(resetProducts());
           navigate("/");
         }}
       >
@@ -88,9 +94,7 @@ const AppHeader = ({ setOpen }) => {
               className="cart-icon"
             />
           </Badge>
-          <span className="price">
-            $ {parseFloat(subTotal).toFixed(2)}
-          </span>
+          <span className="price">$ {parseFloat(subTotal).toFixed(2)}</span>
         </div>
       </div>
     </header>
