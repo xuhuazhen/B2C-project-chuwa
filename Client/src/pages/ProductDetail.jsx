@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, useLocation  } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Image, Typography } from "antd";
+import { Image, Typography, message } from "antd";
 
 import { fetchProductById } from "/src/service/productService";
 import { useDebouncedCartSync } from "../hooks/useDebouncedCartSync";
@@ -21,25 +21,29 @@ const money = (n) => {
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  // const dispatch = useDispatch();
+  const location = useLocation();
+
+  // 购物车同步（你项目已有的 hook）
   const { handleAdd, handleQuantity } = useDebouncedCartSync();
 
   // 兼容不同 slice 命名（任选存在的）
   const user =
     useSelector((s) => s.user?.user || s.user?.currentUser || s.auth?.user) ||
     null;
-  // const cartItems = useSelector((s) => s.cart?.items || []);
 
   const [loading, setLoading] = useState(true);
   const [prod, setProd] = useState(null);
   const [err, setErr] = useState("");
-
+  const [qty, setQty] = useState(1); // ✅ 数量（允许到 0）
+  
   useEffect(() => {
-    (async () => {
+    (async () => { 
+      console.log('fetch')
       try {
         setLoading(true);
         const data = await fetchProductById(id);
         setProd(data.product);
+        setQty(1);
       } catch (e) {
         setErr(e?.response?.data?.message || "Failed to load product.");
       } finally {
@@ -55,58 +59,53 @@ export default function ProductDetail() {
   const isAdmin = user?.role === "admin";
   const image = getImage(prod) || PLACEHOLDER;
 
-  const inStock =
-    (typeof prod.inStock === "boolean" ? prod.inStock : undefined) ??
-    (typeof prod.stock === "number" ? prod.stock > 0 : true);
+  // 以后端的 stock 为准；若无则仅用于展示 “In Stock”
+  const stockNumber =
+    typeof prod.stock === "number"
+      ? prod.stock
+      : typeof prod.inStock === "boolean"
+      ? prod.inStock
+        ? 9999
+        : 0
+      : 9999;
 
-  // // 访客购物车（localStorage 兜底；结构与 Redux 对齐）
-  // const addToGuestCart = (product, qty = 1) => {
-  //   const key = "guest_cart";
-  //   const raw = localStorage.getItem(key);
-  //   const cart = raw ? JSON.parse(raw) : [];
-  //   const idx = cart.findIndex(
-  //     (it) => (it.product?._id || it.product?.id) === (product._id || product.id)
-  //   );
-  //   if (idx >= 0) cart[idx] = { ...cart[idx], quantity: cart[idx].quantity + qty };
-  //   else cart.push({ product, quantity: qty });
-  //   localStorage.setItem(key, JSON.stringify(cart));
-  //   alert("Added to cart (guest).");
-  // };
+  const inStock = stockNumber > 0;
 
-  const onAddToCart = async () => {
+  // ✅ 数量控制：0..stock
+  const inc = () => {
     if (!inStock) return;
-    handleAdd(prod);
-    // if (!user) {
-    //   addToGuestCart(prod, 1);
-    //   return;
-    // }
-
-    // // 计算 nextCart（与你们 cart.items 结构一致）
-    // const nextCart = (() => {
-    //   const i = cartItems.findIndex(
-    //     (it) => (it.product?._id || it.product?.id) === (prod._id || prod.id)
-    //   );
-    //   if (i >= 0) return cartItems.map((it, idx) => (idx === i ? { ...it, quantity: it.quantity + 1 } : it));
-    //   return [...cartItems, { product: prod, quantity: 1 }];
-    // })();
-
-    // // 乐观更新
-    // const prev = cartItems;
-    // dispatch(storeCartItems(nextCart));
-
-    // const userId = user._id || user.id;
-    // try {
-    //   await dispatch(updateCartThunk({ userId, prevCart: prev })).unwrap();
-    //   alert("Added to cart.");
-    // } catch (e) {
-    //   console.error(e);
-    //   alert(e || "Failed to update cart.");
-    //   // 失败时 thunk 内已回滚 prevCart
-    // }
+    setQty((q) => {
+      const next = Math.min(q + 1, stockNumber);
+      if (next === q) message.info("Reached stock limit");
+      return next;
+    });
   };
 
-  const onEdit = () =>
-    navigate(`/admin/createNewProduct?id=${prod._id || prod.id}`);
+  const dec = () => {
+    // 允许到 0；如果你希望“到 0 即自动移除”，可在这里调用 handleQuantity(pid, 0)
+    setQty((q) => Math.max(0, q - 1));
+  };
+
+  // 提交：qty===0 走移除，>0 走加入（支持一次性加 qty）
+  const onAddToCart = async () => {
+    if (!inStock && qty > 0) return; // 无库存时不允许新增
+    const pid = prod?._id || prod?.id;
+    try {
+      if (qty === 0) {
+        await Promise.resolve(handleQuantity?.(pid, 0)); // 设为 0 = 移除
+        message.success("Removed from cart");
+      } else {
+        console.log(prod)
+        await Promise.resolve(handleAdd?.(prod, qty)); // 一次性加入 qty
+        message.success("Added to cart");
+      }
+    } catch (e) {
+      console.error(e);
+      message.error("Failed to update cart");
+    }
+  };
+
+  const onEdit = () => navigate(`/admin/createNewProduct?id=${prod._id || prod.id}`);
 
   return (
     <MainLayout>
@@ -145,7 +144,7 @@ export default function ProductDetail() {
                 color: inStock ? "#166534" : "#991b1b",
               }}
             >
-              {inStock ? "In Stock" : "Out of Stock"}
+              {inStock ? `In Stock (${stockNumber})` : "Out of Stock"}
             </span>
           </div>
 
@@ -154,21 +153,82 @@ export default function ProductDetail() {
           </Title>
           <Paragraph>{prod.description || "No description."}</Paragraph>
 
-          <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
+          {/* ✅ 数量 +/- 控件（允许到 0） */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              marginTop: 12,
+            }}
+          >
+            <button
+              onClick={dec}
+              disabled={!inStock || qty <= 0}
+              aria-label="decrease"
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 8,
+                border: "1px solid #ddd",
+                background: "#fff",
+                cursor: !inStock || qty <= 0 ? "not-allowed" : "pointer",
+                fontSize: 18,
+                lineHeight: "34px",
+              }}
+            >
+              −
+            </button>
+            <div
+              style={{
+                minWidth: 48,
+                textAlign: "center",
+                border: "1px solid #eee",
+                borderRadius: 8,
+                padding: "6px 10px",
+                fontVariantNumeric: "tabular-nums",
+              }}
+            >
+              {qty}
+            </div>
+            <button
+              onClick={inc}
+              disabled={!inStock || qty >= stockNumber}
+              aria-label="increase"
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 8,
+                border: "1px solid #ddd",
+                background: "#fff",
+                cursor:
+                  !inStock || qty >= stockNumber ? "not-allowed" : "pointer",
+                fontSize: 18,
+                lineHeight: "34px",
+              }}
+            >
+              +
+            </button>
+          </div>
+
+          <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
             {!isAdmin && (
               <button
-                disabled={!inStock}
+                disabled={!inStock && qty > 0}
                 onClick={onAddToCart}
                 style={{
                   padding: "8px 16px",
                   borderRadius: 8,
                   border: "1px solid #000",
-                  background: inStock ? "#000" : "#eee",
-                  color: inStock ? "#fff" : "#999",
-                  cursor: inStock ? "pointer" : "not-allowed",
+                  background:
+                    (!inStock && qty > 0) ? "#eee" : "#000",
+                  color:
+                    (!inStock && qty > 0) ? "#999" : "#fff",
+                  cursor:
+                    (!inStock && qty > 0) ? "not-allowed" : "pointer",
                 }}
               >
-                Add to Cart
+                {qty === 0 ? "Remove" : "Add to Cart"}
               </button>
             )}
             {isAdmin && (
