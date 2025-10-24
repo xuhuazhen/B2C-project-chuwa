@@ -280,7 +280,7 @@ export default function ProductDetail() {
                 Edit
               </button>
             )}
-            <Link to="/products" style={{ alignSelf: "center" }}>
+            <Link to="/" style={{ alignSelf: "center" }}>
               ← Back to Products
             </Link>
           </div>
