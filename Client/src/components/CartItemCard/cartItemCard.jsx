@@ -13,11 +13,11 @@ export const CartItemCard = React.memo(({ item, isOutOfStock }) => {
     const { handleQuantity, handleRemove } = useDebouncedCartSync();
     const [disabled, setDisabled] = useState('');
 
-    const handleInput = (e) => {
-        const val = Number(e.target.value);
-        if (isNaN(val) || val > item.quantity) return;
-        handleQuantity(item.product._id, val);
-    }
+    // const handleInput = (e) => {
+    //     const val = Number(e.target.value);
+    //     //if (val > item.quantity) return;
+    //     handleQuantity(item.product._id, val);
+    // }
     
     const handleButtonClick = (value) => {
         const updateQty = item.quantity + value;
@@ -58,12 +58,7 @@ export const CartItemCard = React.memo(({ item, isOutOfStock }) => {
                                 onClick={() => { 
                                     handleButtonClick(-1);
                                 }}>-</Button>
-                            <input 
-                                size='small'
-                                type='text'
-                                value={item.quantity} 
-                                onChange={handleInput}
-                            />
+                            <p style={{padding: '0 10px', margin: '0'}}>{item.quantity}</p>
                             <Button size='small' 
                                 disabled={ disabled === 'plus'}
                                 onClick={() => { 

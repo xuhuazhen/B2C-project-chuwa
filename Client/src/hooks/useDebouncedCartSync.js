@@ -44,16 +44,10 @@ export const useDebouncedCartSync = (wait = 300) => {
     [dispatch, wait]
   );
 
-  // 设定某商品的“目标数量”
-  // 约定：qty <= 0 则移除该商品
   const handleQuantity = (productId, qty) => {
-    if (qty <= 0) return;
-    const prev = lastSyncedCart.current;
-    // if (qty < 0) {
-    //   dispatch(removeItem(productId));
-    // } else {
-      dispatch(updateQuantity({ productId, quantity: qty }));
-    // }
+    const prev = lastSyncedCart.current; 
+    dispatch(updateQuantity({ productId, quantity: qty }));
+    
     if (user.isLoggedIn) debouncedUpdate(prev);
   };
 
@@ -67,11 +61,9 @@ export const useDebouncedCartSync = (wait = 300) => {
   // 兼容两种 reducer 写法：
   // - addToCart(product)
   // - addToCart({ product, qty })
-  const handleAdd = (product, qty = 1) => {
+  const handleAdd = (product) => {
     const prev = lastSyncedCart.current;
-    // 若你的 reducer 只收 product，这里传入 product 也能工作（等于 +1）
-    // 若你的 reducer 支持 {product, qty}，则可一次性 +qty
-    dispatch(qty === 1 ? addToCart(product) : addToCart({ product, qty }));
+    dispatch(addToCart(product));
     if (user.isLoggedIn) debouncedUpdate(prev);
   };
 
