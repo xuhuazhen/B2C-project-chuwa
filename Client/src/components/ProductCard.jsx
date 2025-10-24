@@ -155,14 +155,14 @@ const ProductCard = React.memo(({ product }) => {
               padding: '0px 10px',
             }}
           >
-            <MinusOutlined
-              style={{ fontSize: "15px" }}
+            <MinusOutlined className="edit-button"
+              style={{ fontSize: "15px", width: "100%" }}
               onClick={() => handleQuantity(product._id, cartItem.quantity - 1)}
             />
             <span>{cartItem?.quantity || 0}</span>
 
-            <PlusOutlined
-              style={{ fontSize: "15px" }}
+            <PlusOutlined className="edit-button"
+              style={{ fontSize: "15px", width: "100%"  }}
               onClick={() => handleQuantity(product._id, cartItem.quantity + 1)}
             />
           </Button>

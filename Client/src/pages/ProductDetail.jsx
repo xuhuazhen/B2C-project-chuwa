@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link  } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Image, Typography, message } from "antd";
 
@@ -23,20 +23,25 @@ export default function ProductDetail() {
   const navigate = useNavigate();
 
   // 购物车同步（你项目已有的 hook）
-  const { handleAdd, handleQuantity } = useDebouncedCartSync();
+  const { handleAdd, handleQuantity, handleRemove } = useDebouncedCartSync();
 
   // 兼容不同 slice 命名（任选存在的）
-  const user =
-    useSelector((s) => s.user?.user || s.user?.currentUser || s.auth?.user) ||
-    null;
+  const user = useSelector((s) => s.user.curUser) || null;
 
   const [loading, setLoading] = useState(true);
   const [prod, setProd] = useState(null);
   const [err, setErr] = useState("");
   const [qty, setQty] = useState(1); // ✅ 数量（允许到 0）
 
+  // 获取cart中对应的item
+  const cartItems = useSelector((state) => state.cart.items || []);
+  const cartItem = prod ? cartItems.find((i) => i.product._id === prod._id) : null;  
+  const inCart = !!cartItem;
+
+  
   useEffect(() => {
-    (async () => {
+    (async () => { 
+      console.log('fetch')
       try {
         setLoading(true);
         const data = await fetchProductById(id);
@@ -49,6 +54,11 @@ export default function ProductDetail() {
       }
     })();
   }, [id]);
+
+  useEffect(() => {
+    if (cartItem) setQty(cartItem.quantity);
+    else setQty(1); // 默认 1
+  }, [cartItem]);
 
   if (loading) return <div>Loading...</div>;
   if (err) return <div style={{ color: "red" }}>{err}</div>;
@@ -70,39 +80,73 @@ export default function ProductDetail() {
   const inStock = stockNumber > 0;
 
   // ✅ 数量控制：0..stock
-  const inc = () => {
+  // const inc = () => {
+  //   if (!inStock) return;
+  //   setQty((q) => {
+  //     const next = Math.min(q + 1, stockNumber);
+  //     if (next === q) message.info("Reached stock limit");
+  //     return next;
+  //   });
+  // };
+
+  // const dec = () => {
+  //   // 允许到 0；如果你希望“到 0 即自动移除”，可在这里调用 handleQuantity(pid, 0)
+  //   setQty((q) => Math.max(0, q - 1));
+  // };
+
+  // // 提交：qty===0 走移除，>0 走加入（支持一次性加 qty）
+  // const onAddToCart = async () => {
+  //   if (!inStock && qty > 0) return; // 无库存时不允许新增
+  //   const pid = prod?._id || prod?.id;
+  //   try {
+  //     if (qty === 0) {
+  //       await Promise.resolve(handleQuantity?.(pid, 0)); // 设为 0 = 移除
+  //       message.success("Removed from cart");
+  //     } else {
+  //       console.log(prod)
+  //       await Promise.resolve(handleAdd?.(prod, qty)); // 一次性加入 qty
+  //       message.success("Added to cart");
+  //     }
+  //   } catch (e) {
+  //     console.error(e);
+  //     message.error("Failed to update cart");
+  //   }
+  // };
+    const inc = () => {
     if (!inStock) return;
-    setQty((q) => {
-      const next = Math.min(q + 1, stockNumber);
-      if (next === q) message.info("Reached stock limit");
-      return next;
-    });
+    const next = Math.min(qty + 1, stockNumber);
+    setQty(next);
+    handleQuantity(prod._id, next);
   };
 
-  const dec = () => {
-    // 允许到 0；如果你希望“到 0 即自动移除”，可在这里调用 handleQuantity(pid, 0)
-    setQty((q) => Math.max(0, q - 1));
+  const dec = async () => {
+    const next = Math.max(qty - 1, 1);
+    setQty(next);
+     handleQuantity(prod._id, next);
   };
 
-  // 提交：qty===0 走移除，>0 走加入（支持一次性加 qty）
-  const onAddToCart = async () => {
-    if (!inStock && qty > 0) return; // 无库存时不允许新增
-    const pid = prod?._id || prod?.id;
+  const onAddToCart = () => {
+    if (!inStock) return;
     try {
-      if (qty === 0) {
-        await Promise.resolve(handleQuantity?.(pid, 0)); // 设为 0 = 移除
-        message.success("Removed from cart");
-      } else {
-        await Promise.resolve(handleAdd?.(prod, qty)); // 一次性加入 qty
-        message.success("Added to cart");
-      }
+      handleAdd(prod, qty);
+      message.success("Added to cart");
     } catch (e) {
       console.error(e);
-      message.error("Failed to update cart");
+      message.error("Failed to add to cart");
+    }
+  };
+  
+  const onRemove = () => {
+    try {
+      handleRemove(prod._id);
+      message.success("Removed from cart");
+    } catch (e) {
+      console.error(e);
+      message.error("Failed to remove from cart");
     }
   };
 
-  const onEdit = () => navigate(`/admin/createNewProduct?id=${prod._id || prod.id}`);
+  const onEdit = () => navigate(`/admin/create-product/${prod._id || prod.id}`);
 
   return (
     <MainLayout>
@@ -151,7 +195,7 @@ export default function ProductDetail() {
           <Paragraph>{prod.description || "No description."}</Paragraph>
 
           {/* ✅ 数量 +/- 控件（允许到 0） */}
-          <div
+          { inCart && <div
             style={{
               display: "flex",
               alignItems: "center",
@@ -207,12 +251,13 @@ export default function ProductDetail() {
               +
             </button>
           </div>
+          }
 
           <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
-            {!isAdmin && (
               <button
-                disabled={!inStock && qty > 0}
-                onClick={onAddToCart}
+                // disabled={!inStock && qty > 0}
+                disabled={!inStock}
+                onClick={!inCart ? onAddToCart : onRemove}
                 style={{
                   padding: "8px 16px",
                   borderRadius: 8,
@@ -225,9 +270,8 @@ export default function ProductDetail() {
                     (!inStock && qty > 0) ? "not-allowed" : "pointer",
                 }}
               >
-                {qty === 0 ? "Remove" : "Add to Cart"}
+                {inCart ? "Remove" : "Add to Cart"}
               </button>
-            )}
             {isAdmin && (
               <button
                 onClick={onEdit}
