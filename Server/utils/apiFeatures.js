@@ -2,6 +2,8 @@ export class APIFeatures {
   constructor(query, queryString) {
     this.query = query; //Mongoose query Product.find()
     this.queryString = queryString; //query parameters from the URL
+    this.page = parseInt(queryString.page) || 1;
+    this.limit = parseInt(queryString.limit) || 8;
   }
 
   //Sorting by price, -price, latest
@@ -17,15 +19,8 @@ export class APIFeatures {
 
   //Pagination
   paginate() {
-    const page = parseInt(this.queryString.page, 8) || 1;
-    const limit = parseInt(this.queryString.limit, 8) || 8;
-    const skip = (page - 1) * limit;
-
-    //page=3&limit=8
-    this.query = this.query.skip(skip).limit(limit);
-
-    this.page = page; //save page
-    this.limit = limit; //save limit
+    const skip = (this.page - 1) * this.limit;
+    this.query = this.query.skip(skip).limit(this.limit);
     return this;
   }
 

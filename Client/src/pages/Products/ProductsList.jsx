@@ -24,7 +24,7 @@ export default function ProductsList() {
 
   const userRole = useSelector((store) => store.user.curUser?.role);
 
-  // Set initial limit based on screen width
+  //Set initial limit based on screen width
   useEffect(() => {
     // const width = window.innerWidth;
     // const initialLimit = width >= 1024 ? 10 : width >= 768 ? 6 : 3;
@@ -32,15 +32,19 @@ export default function ProductsList() {
     dispatch(setLimit(initialLimit));
   }, [dispatch]);
 
-  // Fetch only if not cached
+  //Fetch products for current page/sort/limit if not cached
   useEffect(() => {
-    if (!products[currentPage]) {
+    const cacheKey = `${currentPage}-${limit}-${sort}`;
+    if (!products[cacheKey]) {
       dispatch(fetchProductThunk({ page: currentPage, limit, sort }));
     }
   }, [dispatch, currentPage, limit, sort, products]);
 
-  const productResults = products[currentPage] || [];
+  //Get products for this page from cache
+  const cacheKey = `${currentPage}-${limit}-${sort}`;
+  const productResults = products[cacheKey] || [];
 
+  //Sort dropdown
   const items = [
     { key: "price", label: "Price: low to high" },
     { key: "-price", label: "Price: high to low" },
@@ -49,6 +53,7 @@ export default function ProductsList() {
 
   const sortChangeHandler = ({ key }) => {
     dispatch(setSort(key));
+    dispatch(setCurrentPage(1)); //reset page on sort change
   };
 
   const SortDropdown = () => (
@@ -106,7 +111,7 @@ export default function ProductsList() {
         </Flex>
       </Flex>
 
-      {loading && !products.length ? (
+      {loading && !productResults.length ? (
         <Spin tip="Loading products..." />
       ) : (
         <>

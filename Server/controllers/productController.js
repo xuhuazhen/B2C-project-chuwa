@@ -4,24 +4,34 @@ import { APIFeatures } from "../utils/apiFeatures.js";
 import { AppError } from "../utils/appError.js";
 import mongoose from "mongoose";
 
-// GET /api/products
+//GET /api/products
 export const get_products = catchAsync(async (req, res, next) => {
   console.log("REQ QUERY:", req.query);
 
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 8;
+  const sort = req.query.sort || "-createdAt";
+
+  //Build query features
   const features = new APIFeatures(Product.find(), req.query).sort().paginate();
+
   const products = await features.query.lean();
   const pagination = await features.getPaginationData(Product);
+
+  //Create a cacheKey for frontend caching: page-limit-sort
+  const cacheKey = `${page}-${limit}-${sort}`;
 
   res.status(200).json({
     status: "success",
     message: products.length === 0 ? "list is empty" : "",
     results: products.length,
     pagination,
+    cacheKey, //new field
     products,
   });
 });
 
-// GET /api/products/search?q=xx
+//GET /api/products/search?q=xx
 export const get_search = catchAsync(async (req, res, next) => {
   const query = req.query.q || "";
   if (!query.trim()) {
@@ -44,7 +54,7 @@ export const get_search = catchAsync(async (req, res, next) => {
   });
 });
 
-// GET /api/products/:id
+//GET /api/products/:id
 export const get_productById = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -55,7 +65,7 @@ export const get_productById = catchAsync(async (req, res, next) => {
   res.status(200).json({ status: "success", product });
 });
 
-// POST /api/products
+//POST /api/products
 export const create_product = catchAsync(async (req, res, next) => {
   console.log("✅ [create_product] hit");
   console.log("body:", req.body);
@@ -107,7 +117,18 @@ export const post_product = catchAsync(async (req, res, next) => {
     return next(new AppError("Invalid product", 400));
   }
 
-  const allowedFields = ["name", "description", "category", "price", "stock", "image", "imageUrl", "imageURL", "img", "isActive"];
+  const allowedFields = [
+    "name",
+    "description",
+    "category",
+    "price",
+    "stock",
+    "image",
+    "imageUrl",
+    "imageURL",
+    "img",
+    "isActive",
+  ];
   const updates = {};
 
   for (const key of allowedFields) {
@@ -135,12 +156,13 @@ export const post_product = catchAsync(async (req, res, next) => {
 
   // 处理图片字段，优先级 image > imageUrl > imageURL > img
   if (updates.image || updates.imageUrl || updates.imageURL || updates.img) {
-    updates.image = updates.image || updates.imageUrl || updates.imageURL || updates.img;
+    updates.image =
+      updates.image || updates.imageUrl || updates.imageURL || updates.img;
   }
 
   // 查找并更新
   const product = await Product.findByIdAndUpdate(id, updates, {
-    new: true,      // 返回更新后的 document
+    new: true, // 返回更新后的 document
     runValidators: true, // 触发 schema 校验
   });
 

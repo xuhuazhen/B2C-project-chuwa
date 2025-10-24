@@ -9,7 +9,10 @@ export const fetchProductThunk = createAsyncThunk(
       return {
         products: data.products,
         page,
+        limit,
+        sort,
         totalPages: data.pagination.totalPages,
+        cacheKey: data.cacheKey, //include from backend
       };
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);

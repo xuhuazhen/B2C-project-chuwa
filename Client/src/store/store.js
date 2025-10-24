@@ -16,7 +16,7 @@ const rootReducer = combineReducers({
   user: userReducer,
   cart: cartReducer,
   products: productsReducer,
-  search: searchReducer, 
+  search: searchReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
